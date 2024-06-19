@@ -47,28 +47,33 @@ func (me QObject) SetProperty(name string, valuex any) bool {
 
 	var value = QVarintNew2(valuex)
 
-	symname := "__ZN7QObject11setPropertyEPKcRK8QVariant"
+	symname := "_ZN7QObject11setPropertyEPKcRK8QVariant"
 	sym := dlsym(symname)
-	rv := cgopp.Litfficallg(sym, me.Cthis, cgopp.StrtoVptrRef(&name), value.Cthis)
+	name4c := cgopp.CString(name)
+	defer cgopp.Cfree(name4c)
+	rv := cgopp.Litfficallg(sym, me.Cthis, name4c, value.Cthis)
 	log.Println(rv)
 	return true
 }
 
 // int/str/list???
-func (me QObject) Property(name string) gopp.Any {
-	symname := "__ZNK7QObject8propertyEPKc"
+func (me QObject) Property(name string) QVariant {
+	symname := "QObjectProperty1"
 	sym := dlsym(symname)
 	name4c := cgopp.CString(name)
 	defer cgopp.Cfree(name4c)
 	rv := cgopp.Litfficallg(sym, me.Cthis, name4c)
 	// log.Println(rv)
-	return gopp.ToAny(rv)
+	return QVariantof(rv)
 }
 func (me QObject) FindChild(objname string) QObject {
 
 	sym := dlsym("QObjectFindChild1")
-	on4c := cgopp.StrtoVptrRef(&objname)
+	// on4c := cgopp.StrtoVptrRef(&objname)
+	on4c := cgopp.CString(objname)
+	defer cgopp.Cfree(on4c)
 	rv := cgopp.Litfficallg(sym, me.Cthis, on4c)
+	log.Println(rv)
 	return QObjectof(rv)
 }
 
@@ -153,8 +158,10 @@ func QQmlApplicationEngineof(ptr voidptr) QQmlApplicationEngine {
 	return QQmlApplicationEngine{ptr}
 }
 func QQmlApplicationEngineNew() QQmlApplicationEngine {
-	sym := dlsym("__ZN21QQmlApplicationEngineC1EP7QObject")
-	rv := cgopp.Litfficallg(sym, nil)
+	// sym := dlsym("_ZN21QQmlApplicationEngineC1EP7QObject")
+	sym := dlsym("QQmlApplicationEngineNew")
+	log.Println(sym)
+	rv := cgopp.Litfficallg(sym)
 	return QQmlApplicationEngineof(rv)
 }
 func (me QQmlApplicationEngine) Load(u string) {
