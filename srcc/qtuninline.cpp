@@ -45,6 +45,11 @@ void* QVariantToptr(QVariant*p) {
     return (void*)rv;
 }
 
+void QMetaObjectInvokeMethod1(void* fnptrx, void* n) {
+    QObject* o = qApp;
+    void (*fnptr)(void*) = (void(*)(void*))fnptrx;
+    QMetaObject::invokeMethod(o, [fnptr,n]{ fnptr(n); }, Qt::QueuedConnection);
+}
 
 QObject* QObjectFindChild1(QObject*obj, char*str) {
     auto rv = obj->findChild<QObject*>(str);

@@ -1,15 +1,23 @@
 package minqt
 
 import (
+	"fmt"
 	"log"
 	"reflect"
+	"sync/atomic"
 
 	"github.com/ebitengine/purego"
 	_ "github.com/ebitengine/purego"
 
 	"github.com/kitech/gopp"
 	"github.com/kitech/gopp/cgopp"
+
+	cmap "github.com/orcaman/concurrent-map/v2"
 )
+
+/*
+ */
+import "C"
 
 // inline 的函数/方法就没法搞了。。。
 
@@ -25,15 +33,63 @@ func call0(name string) voidptr {
 	return rv
 }
 
+// todo
+type seqfnpair struct {
+	np *int64
+	f  func()
+}
+
+var runuithfns = cmap.New[seqfnpair]()
+var runuithseq int64 = 10000
+
+//export qtuithcbfningo
+func qtuithcbfningo(n *int64) {
+	key := fmt.Sprintf("%d", *n)
+	// log.Println(*n, key)
+	pair, ok := runuithfns.Get(key)
+	if ok {
+		pair.f()
+		runuithfns.Remove(key)
+	}
+}
+
+func RunonUithread(f func()) {
+
+	const name = "QMetaObjectInvokeMethod1"
+	sym := dlsym(name)
+	sym2 := dlsym("qtuithcbfningo")
+	// log.Println(sym, name, sym2)
+
+	seq := new(int64)
+	*seq = atomic.AddInt64(&runuithseq, 3)
+
+	key := fmt.Sprintf("%d", *seq)
+	runuithfns.Set(key, seqfnpair{seq, f})
+
+	cgopp.Litfficallg(sym, sym2, seq)
+}
+
+// ///
+var symcache = cmap.New[voidptr]()
+
+// 这个函数很快，50ns
 // current process
 func dlsym(name string) voidptr {
-	sym, err := purego.Dlsym(purego.RTLD_DEFAULT, name)
+	// if sym, ok := symcache.Get(name); ok {
+	// 	return sym
+	// }
+	symi, err := purego.Dlsym(purego.RTLD_DEFAULT, name)
 	gopp.ErrPrint(err, name)
 	if gopp.ErrHave(err, "symbol not found") {
 		// sym, err = purego.Dlsym(purego.RTLD_DEFAULT, "_"+name)
 	}
-	return voidptr(sym)
+	sym := voidptr(symi)
+	// if sym != nil {
+	// 	symcache.Set(name, sym)
+	// }
+	return sym
 }
+func Dlsym0(name string) voidptr { return dlsym(name) }
 
 type QObject struct {
 	Cthis voidptr
@@ -43,22 +99,25 @@ func QObjectof(ptr voidptr) QObject {
 	return QObject{ptr}
 }
 
+// why slow, 1ms?
 func (me QObject) SetProperty(name string, valuex any) bool {
 
 	var value = QVarintNew2(valuex)
 
-	symname := "_ZN7QObject11setPropertyEPKcRK8QVariant"
+	const symname = "_ZN7QObject11setPropertyEPKcRK8QVariant"
+
 	sym := dlsym(symname)
 	name4c := cgopp.CString(name)
 	defer cgopp.Cfree(name4c)
 	rv := cgopp.Litfficallg(sym, me.Cthis, name4c, value.Cthis)
-	log.Println(rv)
+	// log.Println(rv)
+	gopp.GOUSED(rv)
 	return true
 }
 
 // int/str/list???
 func (me QObject) Property(name string) QVariant {
-	symname := "QObjectProperty1"
+	const symname = "QObjectProperty1"
 	sym := dlsym(symname)
 	name4c := cgopp.CString(name)
 	defer cgopp.Cfree(name4c)
@@ -69,11 +128,10 @@ func (me QObject) Property(name string) QVariant {
 func (me QObject) FindChild(objname string) QObject {
 
 	sym := dlsym("QObjectFindChild1")
-	// on4c := cgopp.StrtoVptrRef(&objname)
 	on4c := cgopp.CString(objname)
 	defer cgopp.Cfree(on4c)
 	rv := cgopp.Litfficallg(sym, me.Cthis, on4c)
-	log.Println(rv)
+	// log.Println(rv)
 	return QObjectof(rv)
 }
 
@@ -105,7 +163,7 @@ func QVarintNew2(vx any) QVariant {
 	return vp
 }
 func QVarintNew[T int | int64 | string | voidptr](vx T) QVariant {
-	log.Println(reflect.TypeOf(any(vx)), vx)
+	// log.Println(reflect.TypeOf(any(vx)), vx)
 	switch v := any(vx).(type) {
 	case int:
 		sym := dlsym("QVariantNewInt")
@@ -160,7 +218,7 @@ func QQmlApplicationEngineof(ptr voidptr) QQmlApplicationEngine {
 func QQmlApplicationEngineNew() QQmlApplicationEngine {
 	// sym := dlsym("_ZN21QQmlApplicationEngineC1EP7QObject")
 	sym := dlsym("QQmlApplicationEngineNew")
-	log.Println(sym)
+	// log.Println(sym)
 	rv := cgopp.Litfficallg(sym)
 	return QQmlApplicationEngineof(rv)
 }

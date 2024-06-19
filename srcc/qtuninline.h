@@ -22,6 +22,8 @@ QVariant* QVariantNewPtr(void*ptr);
 void* QVariantToptr(QVariant*p);
 // void* QVariantNewListstr();
 
+void QMetaObjectInvokeMethod1(void* fnptrx, void* n);
+
 QObject* QObjectFindChild1(QObject*obj, char*str);
 QVariant* QObjectProperty1(QObject*obj, char*str);
 
