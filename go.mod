@@ -4,8 +4,10 @@ go 1.22.3
 
 require (
 	github.com/ebitengine/purego v0.7.1
-	github.com/kitech/gopp v0.0.0-20240611042533-447a4b19c1c0
+	github.com/kitech/gopp v0.0.0
 )
+
+replace github.com/kitech/gopp => ../goplusplus
 
 require (
 	github.com/Workiva/go-datastructures v1.1.3 // indirect
