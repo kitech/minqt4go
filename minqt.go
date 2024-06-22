@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"regexp"
+	"strings"
 	"sync/atomic"
 
 	"github.com/ebitengine/purego"
@@ -67,6 +69,53 @@ func RunonUithread(f func()) {
 	runuithfns.Set(key, seqfnpair{seq, f})
 
 	cgopp.Litfficallg(sym, sym2, seq)
+}
+
+// 应该放在minqt包里面
+func SetQtmsgout(f func(typ int, file, funcname, msg string) bool) {
+	if f == nil {
+		log.Println("set nil func is not allowed")
+		return
+	}
+	qtmsgoutfn = f
+}
+
+var OnMissingCall = func(callee string) {
+	gopp.Debug("caller missing", callee)
+}
+var qtmsgoutfn = qtMsgoutput
+
+func qtMsgoutput(typ int, file, funcname, msg string) bool {
+	gopp.Debug(typ, file, funcname, msg)
+
+	if strings.Contains(msg, "ReferenceError") &&
+		strings.HasSuffix(msg, "is not defined") {
+		// missing function/slot
+		//ReferenceError: neslot1 is not defined
+		reg := regexp.MustCompile(`ReferenceError: ([^ ]+) is not defined`)
+		mats := reg.FindAllStringSubmatch(msg, -1)
+		log.Println(mats)
+		if len(mats) > 0 && len(mats[0]) > 0 {
+			callee := mats[0][1]
+			OnMissingCall(callee)
+		}
+	}
+
+	return true
+}
+
+//export qtMessageOutputGoimpl
+func qtMessageOutputGoimpl(typex C.int, filex *C.char, funcx *C.char, msgx *C.char) {
+	gopp.Debug(typex, filex, funcx, msgx)
+	typ := int(typex)
+	file := cgopp.GoString(voidptr(filex))
+	funcname := cgopp.GoString(voidptr(funcx))
+	msg := cgopp.GoString(voidptr(msgx))
+
+	ok := qtmsgoutfn(typ, file, funcname, msg)
+	if !ok {
+		qtMsgoutput(typ, file, funcname, msg)
+	}
 }
 
 // ///

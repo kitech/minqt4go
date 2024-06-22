@@ -25,7 +25,13 @@ type Datar interface {
 }
 
 func (me *ListModelBase) Add(d Datar) bool {
-	me.datas.Put(d.DedupKey(), d)
+	me.BeginChangeRows(me.datas.Count(), me.datas.Count(), false)
+	ok := me.datas.Put(d.DedupKey(), d)
+	me.EndChangeRows(false)
+	if ok {
+
+	}
+
 	return true
 }
 
@@ -148,13 +154,14 @@ func (me *ListModelBase) RoleName(c int) string {
 
 //export goimplListModelBaseRowCount
 func goimplListModelBaseRowCount(px int64) int {
-	gopp.Info(px)
+	// gopp.Info(px)
 	me := ListModelBaseof(px)
 	return me.RowCount()
 }
 
 func (me *ListModelBase) RowCount() int {
-	return 3
+	return me.datas.Len()
+	// return 3
 }
 
 //export goimplListModelBaseData
@@ -166,7 +173,12 @@ func goimplListModelBaseData(px int64, row int, role int) voidptr {
 
 func (me *ListModelBase) Data(row, role int) voidptr {
 	rv := QVarintNew(fmt.Sprintf("r%d of %d", row, role))
-	gopp.Info(rv, me.RoleName(role))
+	_, dv, ok := me.datas.GetIndex(row)
+	gopp.Info(rv, me.RoleName(role), dv, ok, row, role, me.datas.Len())
+	if dv != nil {
+		v2 := dv.Data(me.RoleName(role))
+		rv = QVarintNew(fmt.Sprintf("%v", v2))
+	}
 	return rv.Cthis
 }
 

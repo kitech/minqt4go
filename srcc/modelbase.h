@@ -8,7 +8,8 @@ class ListModelBase : public QAbstractListModel {
 
     // virutal column
     // Q_PROPERTY(int rolecnt READ rolecnt WRITE setRolecnt FINAL);
-    Q_PROPERTY(QString clazz READ clazz WRITE setClazz FINAL);
+    // Q_PROPERTY(QString clazz READ clazz WRITE setClazz FINAL);
+    Q_PROPERTY(quint64 goobj READ goobj CONSTANT FINAL);
     QML_ELEMENT;
 
 public:
@@ -24,8 +25,11 @@ public:
 
     int rolecnt();
     void setRolecnt(int c);
-    QString clazz();
-    void setClazz(QString c);
+    // QString clazz();
+    // void setClazz(QString c);
+    quint64 goobj() { return goimpl; }
+
+    virtual void mySetObjectName(const QString& c) ;
     
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const ;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;

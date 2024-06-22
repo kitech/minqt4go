@@ -28,6 +28,7 @@ extern "C" qint64 goimplListModelBaseNew(void*);
 ListModelBase::ListModelBase(QObject*parent) : QAbstractListModel(parent) {
     qint64 seqno = goimplListModelBaseNew(this);
     goimpl = seqno;
+    QObject::connect(this, &QObject::objectNameChanged, this, &ListModelBase::mySetObjectName);
 }
 extern "C" void goimplListModelBaseDtor(qint64);
 ListModelBase::~ListModelBase() {
@@ -51,15 +52,19 @@ ListModelBase::~ListModelBase() {
 // }
 
 extern "C" char* goimplListModelBaseGetsetClazz(qint64, char*, int);
-QString ListModelBase::clazz() {
-    char* rv = goimplListModelBaseGetsetClazz(goimpl, 0, 0);
-    return rv;
-}
+// QString ListModelBase::clazz() {
+//     char* rv = goimplListModelBaseGetsetClazz(goimpl, 0, 0);
+//     return rv;
+// }
+// void ListModelBase::setClazz(QString c) {
+//     goimplListModelBaseGetsetClazz(goimpl, c.toUtf8().data(), 1);
+// }
 
-void ListModelBase::setClazz(QString c) {
+void ListModelBase::mySetObjectName(const QString& c){
+    qDebug()<<__FUNCTION__<<c;
+    // QAbstractListModel::setObjectName(c);
     goimplListModelBaseGetsetClazz(goimpl, c.toUtf8().data(), 1);
 }
-
 
 extern "C" void* goimplListModelBaseData(qint64, int, int);
 QVariant ListModelBase::data(const QModelIndex &index, int role) const {
