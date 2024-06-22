@@ -14,9 +14,6 @@ import (
  */
 import "C"
 
-var lmrefs = cmap.New[*ListModelBase]()
-var lmseq int64 = 10000
-
 // 以下是与go交互的代码
 type Datar interface {
 	Data(name string) any
@@ -24,9 +21,27 @@ type Datar interface {
 	OrderKey() int64
 }
 
+// v in [v0, v1], return 0
+// v gt [v0, v1], return 1
+// v lt [v0, v1], return -1
+// v0 <= v1
+func datacmp(v Datar, v0, v1 Datar) int {
+	if v.OrderKey() >= v0.OrderKey() && v.OrderKey() <= v1.OrderKey() {
+		return 0
+	} else if v.OrderKey() < v0.OrderKey() {
+		return -1
+	} else {
+		return 1
+	}
+}
 func (me *ListModelBase) Add(d Datar) bool {
+	if me.datas.Has(d.DedupKey()) {
+		return false
+	}
+	inspos := me.datas.BinFind(d, datacmp)
 	me.BeginChangeRows(me.datas.Count(), me.datas.Count(), false)
-	ok := me.datas.Put(d.DedupKey(), d)
+	// ok := me.datas.Put(d.DedupKey(), d)
+	ok := me.datas.InsertAt(inspos, d.DedupKey(), d)
 	me.EndChangeRows(false)
 	if ok {
 
@@ -42,6 +57,9 @@ var clazzrolenames = cmap.New[[]string]()
 func RegisterModelRoleNames(clazz string, names ...string) {
 	clazzrolenames.Set(clazz, names)
 }
+
+var lmrefs = cmap.New[*ListModelBase]()
+var lmseq int64 = 10000
 
 ////// 以下是与cpp交互的代码
 
@@ -121,21 +139,26 @@ func goimplListModelBaseGetsetClazz(px int64, c voidptr, set int) voidptr {
 	if set == 1 {
 		me.clazz = cgopp.GoString(c)
 	} else {
-		return cgopp.CString(me.clazz)
+		return cgopp.CStringaf(me.clazz)
 	}
 	return nil
 }
 
 //export goimplListModelBaseRoleName
 func goimplListModelBaseRoleName(px int64, c int) voidptr {
-	gopp.Info(px, c)
+	// gopp.Info(px, c)
 
 	me := ListModelBaseof(px)
 	rv := me.RoleName(c)
 	if len(rv) == 0 {
 		return nil
 	}
-	return cgopp.CString(rv)
+
+	// caller free
+	// rv4c := cgopp.CString(rv)
+	rv4c := cgopp.CStringaf(rv)
+	// gopp.Info(px, c, rv)
+	return rv4c
 }
 
 func init() {
@@ -166,7 +189,7 @@ func (me *ListModelBase) RowCount() int {
 
 //export goimplListModelBaseData
 func goimplListModelBaseData(px int64, row int, role int) voidptr {
-	gopp.Info(px, row, role)
+	// gopp.Info(px, row, role)
 	me := ListModelBaseof(px)
 	return me.Data(row, role)
 }
@@ -174,7 +197,9 @@ func goimplListModelBaseData(px int64, row int, role int) voidptr {
 func (me *ListModelBase) Data(row, role int) voidptr {
 	rv := QVarintNew(fmt.Sprintf("r%d of %d", row, role))
 	_, dv, ok := me.datas.GetIndex(row)
-	gopp.Info(rv, me.RoleName(role), dv, ok, row, role, me.datas.Len())
+	if !ok {
+	}
+	// gopp.Info(rv, me.RoleName(role), dv, ok, row, role, me.datas.Len())
 	if dv != nil {
 		v2 := dv.Data(me.RoleName(role))
 		rv = QVarintNew(fmt.Sprintf("%v", v2))

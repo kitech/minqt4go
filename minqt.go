@@ -80,6 +80,7 @@ func SetQtmsgout(f func(typ int, file, funcname, msg string) bool) {
 	qtmsgoutfn = f
 }
 
+// 不过没法传参数... 暂时先放弃了
 var OnMissingCall = func(callee string) {
 	gopp.Debug("caller missing", callee)
 }
@@ -97,7 +98,7 @@ func qtMsgoutput(typ int, file, funcname, msg string) bool {
 		log.Println(mats)
 		if len(mats) > 0 && len(mats[0]) > 0 {
 			callee := mats[0][1]
-			OnMissingCall(callee)
+			OnMissingCall(callee) //
 		}
 	}
 
@@ -156,8 +157,9 @@ func (me QObject) SetProperty(name string, valuex any) bool {
 	const symname = "_ZN7QObject11setPropertyEPKcRK8QVariant"
 
 	sym := dlsym(symname)
-	name4c := cgopp.CString(name)
-	defer cgopp.Cfree(name4c)
+	name4c := cgopp.StrtoRefc(&name)
+	// name4c := cgopp.CString(name)
+	// defer cgopp.Cfree(name4c)
 	rv := cgopp.Litfficallg(sym, me.Cthis, name4c, value.Cthis)
 	// log.Println(rv)
 	gopp.GOUSED(rv)
@@ -168,8 +170,9 @@ func (me QObject) SetProperty(name string, valuex any) bool {
 func (me QObject) Property(name string) QVariant {
 	const symname = "QObjectProperty1"
 	sym := dlsym(symname)
-	name4c := cgopp.CString(name)
-	defer cgopp.Cfree(name4c)
+	// name4c := cgopp.CString(name)
+	// defer cgopp.Cfree(name4c)
+	name4c := cgopp.StrtoRefc(&name)
 	rv := cgopp.Litfficallg(sym, me.Cthis, name4c)
 	// log.Println(rv)
 	return QVariantof(rv)
@@ -177,8 +180,9 @@ func (me QObject) Property(name string) QVariant {
 func (me QObject) FindChild(objname string) QObject {
 
 	sym := dlsym("QObjectFindChild1")
-	on4c := cgopp.CString(objname)
-	defer cgopp.Cfree(on4c)
+	on4c := cgopp.StrtoRefc(&objname)
+	// on4c := cgopp.CString(objname)
+	// defer cgopp.Cfree(on4c)
 	rv := cgopp.Litfficallg(sym, me.Cthis, on4c)
 	// log.Println(rv)
 	return QObjectof(rv)
@@ -227,8 +231,9 @@ func QVarintNew[T int | int64 | string | voidptr](vx T) QVariant {
 
 	case string:
 		sym := dlsym("QVariantNewStr")
-		v4cc := cgopp.CString(v)
-		defer cgopp.Cfree(v4cc)
+		// v4cc := cgopp.CString(v)
+		// defer cgopp.Cfree(v4cc)
+		v4cc := cgopp.StrtoRefc(&v)
 		rv := cgopp.Litfficallg(sym, v4cc)
 		return QVariantof(rv)
 	case voidptr:
@@ -259,6 +264,25 @@ func (me QVariant) Toptr() voidptr {
 	return rv
 }
 
+// ////
+type QQuickItem struct {
+	Cthis voidptr
+}
+
+func QQuickItemof(ptr voidptr) QQuickItem { return QQuickItem{ptr} }
+
+// ////
+// 没有C++类型?
+type QStackView struct {
+	Cthis voidptr
+}
+
+func (me QStackView) Replace(curritem, nextitem QQuickItem) {
+	gopp.Info("todododooooo", curritem, nextitem)
+}
+func QStackViewof(ptr voidptr) QStackView { return QStackView{ptr} }
+
+// ////
 type QQmlApplicationEngine struct{ Cthis voidptr }
 
 func QQmlApplicationEngineof(ptr voidptr) QQmlApplicationEngine {
@@ -273,8 +297,9 @@ func QQmlApplicationEngineNew() QQmlApplicationEngine {
 }
 func (me QQmlApplicationEngine) Load(u string) {
 	sym := dlsym("QQmlApplicationEngineLoad1")
-	v4cc := cgopp.CString(u)
-	defer cgopp.Cfree(v4cc)
+	// v4cc := cgopp.CString(u)
+	// defer cgopp.Cfree(v4cc)
+	v4cc := cgopp.StrtoRefc(&u)
 	cgopp.Litfficallg(sym, v4cc)
 }
 

@@ -18,7 +18,7 @@ QHash<int, QByteArray> ListModelBase::roleNames() const  {
         char* name = goimplListModelBaseRoleName(goimpl, role);
         if (name == nullptr) { break; }
         names[role] = QString(name).toUtf8();
-        free(name);
+        // free(name); // cgopp.CStrSmt
     }
 
     return names;

@@ -1,6 +1,7 @@
 
 #include <QtCore>
 #include <QtQml>
+#include <QtQuick>
 
 #include "qtuninline.h"
 
@@ -41,7 +42,12 @@ QVariant* QVariantNewPtr(void*ptr) {
 }
 void* QVariantToptr(QVariant*p) {
     bool ok = false;
-    auto rv = p->toULongLong(&ok);
+    // auto rv = p->toULongLong(&ok);
+    // auto rv = p->value<QQuickItem*>(); // 这种方式对的
+    // auto x = p->convert(QMetaType::type("void*")); // not work
+    // auto rv = p->value<void*>(); // not work
+    auto rv = p->value<QObject*>(); // works
+    // qDebug()<<__FUNCTION__<<(*p)<<(void*)p<<(*p).data()<<rv;
     return (void*)rv;
 }
 
@@ -57,7 +63,10 @@ QObject* QObjectFindChild1(QObject*obj, char*str) {
 }
 QVariant* QObjectProperty1(QObject*obj, char*str) {
     auto rv = obj->property(str);
-    return new QVariant(rv);
+    // qDebug()<<__FUNCTION__<<rv<<QString(str)<<rv.data();
+    auto rv2 = new QVariant(rv); //
+    // qDebug()<<__FUNCTION__<<__LINE__<<*rv2<<QString(str)<<(*rv2).data();
+    return rv2;
 }
 
 // qml
