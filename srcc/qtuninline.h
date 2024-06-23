@@ -32,6 +32,8 @@ QQmlApplicationEngine* QQmlApplicationEngineNew();
 void QQmlApplicationEngineLoad1(QQmlApplicationEngine*e, char*str);
 QObject* QQmlApplicationEngineRootObject1(QQmlApplicationEngine*e);
 
+void* dlsym0(const char* name);
+
 #ifdef __cplusplus
 };
 #endif

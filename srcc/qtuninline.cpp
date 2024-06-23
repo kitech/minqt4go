@@ -82,3 +82,9 @@ QObject* QQmlApplicationEngineRootObject1(QQmlApplicationEngine*e) {
     auto objs = e->rootObjects();
     return objs.value(0);
 }
+
+/////
+#include <dlfcn.h>
+void* cgoir_dlsym0(const char* name) {
+    return dlsym(RTLD_DEFAULT, name);
+}
