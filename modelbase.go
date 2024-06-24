@@ -196,6 +196,7 @@ func goimplListModelBaseData(px int64, row int, role int) voidptr {
 
 func (me *ListModelBase) Data(row, role int) voidptr {
 	rv := QVarintNew(fmt.Sprintf("r%d of %d", row, role))
+	// defer rv.Dtor()
 	_, dv, ok := me.datas.GetIndex(row)
 	if !ok {
 	}
@@ -219,7 +220,7 @@ func (me *ListModelBase) EndChangeRows(remove bool) {
 	const name1 = "_ZN18QAbstractItemModel13endRemoveRowsEv"
 	sym := gopp.IfElse2(remove, dlsym(name1), dlsym(name0))
 
-	var fno func(voidptr)
-	purego.RegisterFunc(&fno, usize(sym))
-	fno(me.cppimpl)
+	var fnv func(voidptr)
+	purego.RegisterFunc(&fnv, usize(sym))
+	fnv(me.cppimpl)
 }

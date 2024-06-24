@@ -4,6 +4,8 @@
 class QObject;
 class QVariant;
 class QQmlApplicationEngine;
+class QQuickItem;
+class QQuickStackView;
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,7 +34,11 @@ QQmlApplicationEngine* QQmlApplicationEngineNew();
 void QQmlApplicationEngineLoad1(QQmlApplicationEngine*e, char*str);
 QObject* QQmlApplicationEngineRootObject1(QQmlApplicationEngine*e);
 
-void* dlsym0(const char* name);
+// quick templates2
+QQuickItem* QQuickStackView_get(QQuickStackView*me, int idx);
+QQuickItem* QQuickStackView_replaceCurrentItem(QQuickStackView*me, QQuickItem* item);
+
+void* cgoir_dlsym0(const char* name);
 
 #ifdef __cplusplus
 };

@@ -94,7 +94,7 @@ QVariant ListModelBase::data(const QModelIndex &index, int role) const {
     void* tv = goimplListModelBaseData(goimpl, index.row(), role);
     QVariant* tv2 = (QVariant*)tv;
     QVariant rv = QVariant(*tv2);
-    delete tv2;
+    // delete tv2;
     // qDebug()<<__FUNCTION__<<role <<rv;
     return rv;
 }

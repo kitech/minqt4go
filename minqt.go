@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 	"sync/atomic"
+	"time"
 
 	"github.com/ebitengine/purego"
 	_ "github.com/ebitengine/purego"
@@ -153,6 +154,7 @@ func QObjectof(ptr voidptr) QObject {
 func (me QObject) SetProperty(name string, valuex any) bool {
 
 	var value = QVarintNew2(valuex)
+	// defer value.Dtor()
 
 	const symname = "_ZN7QObject11setPropertyEPKcRK8QVariant"
 
@@ -166,6 +168,7 @@ func (me QObject) SetProperty(name string, valuex any) bool {
 	return true
 }
 
+// not need caller free property value, auto free now
 // int/str/list???
 func (me QObject) Property(name string) QVariant {
 	const symname = "QObjectProperty1"
@@ -190,13 +193,29 @@ func (me QObject) FindChild(objname string) QObject {
 
 type QVariant struct {
 	Cthis voidptr
+	cnt   int
+	ci    string
 }
 
-func QVariantof(ptr voidptr) QVariant { return QVariant{ptr} }
+func QVariantof(ptr voidptr) QVariant {
+	if ptr == nil {
+		panic("ptr nil")
+	}
+	me := QVariant{ptr, 0, gopp.ZeroStr}
+	if false {
+		ci := gopp.GetCallerInfo(5)
+		me.ci = ci
+	}
+
+	time.AfterFunc(gopp.DurandSec(3, 5), me.Dtor)
+	return me
+}
 
 func (me QVariant) Dtor() {
 	sym := dlsym("QVariantDtor")
+	// log.Println(sym, me)
 	cgopp.Litfficallg(sym, me.Cthis)
+	me.cnt++
 }
 
 func QVarintNew2(vx any) QVariant {
@@ -213,6 +232,7 @@ func QVarintNew2(vx any) QVariant {
 	default:
 		log.Println("unimpl", reflect.TypeOf(vx), value)
 	}
+	// time.AfterFunc(gopp.DurandSec(3, 5), vp.Dtor)
 	return vp
 }
 func QVarintNew[T int | int64 | string | voidptr](vx T) QVariant {
@@ -241,6 +261,7 @@ func QVarintNew[T int | int64 | string | voidptr](vx T) QVariant {
 		rv := cgopp.Litfficallg(sym, v)
 		return QVariantof(rv)
 	}
+
 	return QVariant{}
 }
 func (me QVariant) Toint() int {

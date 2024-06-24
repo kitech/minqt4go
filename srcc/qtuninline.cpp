@@ -2,6 +2,8 @@
 #include <QtCore>
 #include <QtQml>
 #include <QtQuick>
+#include <QtQuickControls2>
+#include <QtQuickTemplates2>
 
 #include "qtuninline.h"
 
@@ -63,7 +65,10 @@ QObject* QObjectFindChild1(QObject*obj, char*str) {
 }
 QVariant* QObjectProperty1(QObject*obj, char*str) {
     auto rv = obj->property(str);
-    // qDebug()<<__FUNCTION__<<rv<<QString(str)<<rv.data();
+    // qDebug()<<__FUNCTION__<<__LINE__<<obj<<rv<<QString(str);
+    if (!rv.isValid()) {
+        return nullptr;
+    }
     auto rv2 = new QVariant(rv); //
     // qDebug()<<__FUNCTION__<<__LINE__<<*rv2<<QString(str)<<(*rv2).data();
     return rv2;
@@ -82,6 +87,25 @@ QObject* QQmlApplicationEngineRootObject1(QQmlApplicationEngine*e) {
     auto objs = e->rootObjects();
     return objs.value(0);
 }
+
+// quick templates
+// 6.7 添加了许多方法,但是android的qtsdk现在还是6.6的...
+#include <QtQuickTemplates2/private/qquickstackview_p.h>
+void dummyyy() {
+    QQuickStackView *stkwin; // not work
+}
+
+QQuickItem* QQuickStackView_get(QQuickStackView*me, int idx) {
+    QQuickItem* rv = me->get(idx);
+    return rv;
+}
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+QQuickItem* QQuickStackView_replaceCurrentItem(QQuickStackView* me, QQuickItem* item) {
+    auto rv = me->replaceCurrentItem(item);
+    return rv;
+}
+#endif
+
 
 /////
 #include <dlfcn.h>
