@@ -14,6 +14,19 @@ import (
  */
 import "C"
 
+/*
+Usage: foo.qml
+import ListModelBase
+item{
+	ListView{
+		model: ListModelBase {
+			id: barmdl
+			objectName: "barmdl"
+		}
+	}
+}
+*/
+
 // 以下是与go交互的代码
 type Datar interface {
 	Data(name string) any
@@ -60,12 +73,24 @@ var clazzrolenames = cmap.New[[]string]()
 func RegisterModelRoleNames(clazz string, names ...string) {
 	clazzrolenames.Set(clazz, names)
 }
+func RegisterModelRoleNames2(clazz string, stobj any, extraNames ...string) {
+	// clazzrolenames.Set(clazz, names)
+	namesx := gopp.Mapdo(stobj, func(i int, kx, vx any) any {
+		return kx //[]any{vx}
+	})
+	names := gopp.ToStrs2(namesx)
+	roleNames := append(names, extraNames...)
+	// log.Println(roleNames)
+	RegisterModelRoleNames(clazz, roleNames...)
+}
 
 var lmrefs = cmap.New[*ListModelBase]()
 var lmseq int64 = 10000
 
 ////// 以下是与cpp交互的代码
 
+// todo support non ordered
+// todo support non dedup
 type ListModelBase struct {
 	cppimpl voidptr
 	seq     *int64

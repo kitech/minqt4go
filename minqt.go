@@ -24,7 +24,12 @@ import "C"
 
 // inline 的函数/方法就没法搞了。。。
 
-func QVersion() string {
+func QCompVersion() string {
+	rv := call0("QCompileVersion")
+	return cgopp.GoString(rv)
+}
+
+func QRuntimeVersion() string {
 	rv := call0("qVersion")
 	return cgopp.GoString(rv)
 }
@@ -312,6 +317,13 @@ func (me QStackView) Replace(curritem, nextitem QQuickItem) {
 	gopp.Info("todododooooo", curritem, nextitem)
 }
 func QStackViewof(ptr voidptr) QStackView { return QStackView{ptr} }
+func (me QStackView) Get(idx int) QQuickItem {
+	sym := dlsym("QQuickStackView_get")
+	// rv := cgopp.Litfficallg(sym, me.Cthis, idx)
+	rv := cgopp.FfiCall[voidptr](sym, me.Cthis, idx)
+	// gopp.Info("todododooooo", curritem, nextitem)
+	return QQuickItemof(rv)
+}
 
 // ////
 type QQmlApplicationEngine struct{ Cthis voidptr }
