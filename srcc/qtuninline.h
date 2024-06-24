@@ -23,6 +23,9 @@ char* QVariantTostr(QVariant*p);
 QVariant* QVariantNewPtr(void*ptr);
 void* QVariantToptr(QVariant*p);
 // void* QVariantNewListstr();
+void* QVariantNewBool(bool v);
+bool QVariantTobool(QVariant*p);
+
 
 void QMetaObjectInvokeMethod1(void* fnptrx, void* n);
 

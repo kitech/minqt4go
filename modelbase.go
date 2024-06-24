@@ -34,11 +34,14 @@ func datacmp(v Datar, v0, v1 Datar) int {
 		return 1
 	}
 }
+
+// todo batch add
 func (me *ListModelBase) Add(d Datar) bool {
 	if me.datas.Has(d.DedupKey()) {
 		return false
 	}
 	inspos := me.datas.BinFind(d, datacmp)
+	// log.Println(inspos, d.OrderKey(), d.DedupKey())
 	me.BeginChangeRows(me.datas.Count(), me.datas.Count(), false)
 	// ok := me.datas.Put(d.DedupKey(), d)
 	ok := me.datas.InsertAt(inspos, d.DedupKey(), d)

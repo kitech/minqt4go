@@ -198,9 +198,8 @@ type QVariant struct {
 }
 
 func QVariantof(ptr voidptr) QVariant {
-	if ptr == nil {
-		panic("ptr nil")
-	}
+	// gopp.NilPrint(ptr)
+
 	me := QVariant{ptr, 0, gopp.ZeroStr}
 	if false {
 		ci := gopp.GetCallerInfo(5)
@@ -229,13 +228,15 @@ func QVarintNew2(vx any) QVariant {
 		vp = QVarintNew(value)
 	case voidptr:
 		vp = QVarintNew(value)
+	case bool:
+		vp = QVarintNew(value)
 	default:
 		log.Println("unimpl", reflect.TypeOf(vx), value)
 	}
 	// time.AfterFunc(gopp.DurandSec(3, 5), vp.Dtor)
 	return vp
 }
-func QVarintNew[T int | int64 | string | voidptr](vx T) QVariant {
+func QVarintNew[T int | int64 | string | voidptr | bool](vx T) QVariant {
 	// log.Println(reflect.TypeOf(any(vx)), vx)
 	switch v := any(vx).(type) {
 	case int:
@@ -258,6 +259,10 @@ func QVarintNew[T int | int64 | string | voidptr](vx T) QVariant {
 		return QVariantof(rv)
 	case voidptr:
 		sym := dlsym("QVariantNewPtr")
+		rv := cgopp.Litfficallg(sym, v)
+		return QVariantof(rv)
+	case bool:
+		sym := dlsym("QVariantNewBool")
 		rv := cgopp.Litfficallg(sym, v)
 		return QVariantof(rv)
 	}
@@ -283,6 +288,11 @@ func (me QVariant) Toptr() voidptr {
 	sym := dlsym("QVariantToptr")
 	rv := cgopp.Litfficallg(sym, me.Cthis)
 	return rv
+}
+func (me QVariant) Tobool() bool {
+	sym := dlsym("QVariantTobool")
+	rv := cgopp.Litfficallg(sym, me.Cthis)
+	return usize(rv) != 0
 }
 
 // ////

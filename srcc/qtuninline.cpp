@@ -53,6 +53,16 @@ void* QVariantToptr(QVariant*p) {
     return (void*)rv;
 }
 
+void* QVariantNewBool(bool v) {
+    auto rv = new QVariant(v);
+    return rv;
+}
+bool QVariantTobool(QVariant*p) {
+    return p->toBool();
+}
+
+///////////
+
 void QMetaObjectInvokeMethod1(void* fnptrx, void* n) {
     QObject* o = qApp;
     void (*fnptr)(void*) = (void(*)(void*))fnptrx;
