@@ -38,7 +38,7 @@ type Datar interface {
 // v gt [v0, v1], return 1
 // v lt [v0, v1], return -1
 // v0 <= v1
-func datacmp(v Datar, v0, v1 Datar) int {
+func modeldatacmper(v Datar, v0, v1 Datar) int {
 	if v.OrderKey() >= v0.OrderKey() && v.OrderKey() <= v1.OrderKey() {
 		return 0
 	} else if v.OrderKey() < v0.OrderKey() {
@@ -53,14 +53,17 @@ func (me *ListModelBase) Add(d Datar) bool {
 	if me.datas.Has(d.DedupKey()) {
 		return false
 	}
-	inspos := me.datas.BinFind(d, datacmp)
+	var inspos = me.datas.Len()
+	if d.OrderKey() == -1 {
+	} else {
+		inspos = me.datas.BinFind(d, modeldatacmper)
+	}
 	// log.Println(inspos, d.OrderKey(), d.DedupKey())
 	me.BeginChangeRows(me.datas.Count(), me.datas.Count(), false)
 	// ok := me.datas.Put(d.DedupKey(), d)
 	ok := me.datas.InsertAt(inspos, d.DedupKey(), d)
 	me.EndChangeRows(false)
 	if ok {
-
 	}
 
 	return true
