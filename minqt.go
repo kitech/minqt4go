@@ -93,7 +93,16 @@ var OnMissingCall = func(callee string) {
 var qtmsgoutfn = qtMsgoutput
 
 func qtMsgoutput(typ int, file, funcname, msg string) bool {
-	gopp.Debug(typ, file, funcname, msg)
+	// gopp.Debug(typ, file, funcname, msg)
+	// QOV qt output via
+	var rfmsg = msg
+	if strings.HasPrefix(rfmsg, "file://") {
+		pos := strings.Index(rfmsg, " ")
+		path := rfmsg[:pos]
+		bname := gopp.Lastof(strings.Split(path, "/")).Str()
+		rfmsg = fmt.Sprintf("%s%s", bname, rfmsg[pos:])
+	}
+	fmt.Printf("QOVGoLog: %s\n", rfmsg)
 
 	if strings.Contains(msg, "ReferenceError") &&
 		strings.HasSuffix(msg, "is not defined") {
@@ -101,7 +110,7 @@ func qtMsgoutput(typ int, file, funcname, msg string) bool {
 		//ReferenceError: neslot1 is not defined
 		reg := regexp.MustCompile(`ReferenceError: ([^ ]+) is not defined`)
 		mats := reg.FindAllStringSubmatch(msg, -1)
-		log.Println(mats)
+		// log.Println(mats)
 		if len(mats) > 0 && len(mats[0]) > 0 {
 			callee := mats[0][1]
 			OnMissingCall(callee) //
@@ -113,7 +122,7 @@ func qtMsgoutput(typ int, file, funcname, msg string) bool {
 
 //export qtMessageOutputGoimpl
 func qtMessageOutputGoimpl(typex C.int, filex *C.char, funcx *C.char, msgx *C.char) {
-	gopp.Debug(typex, filex, funcx, msgx)
+	// gopp.Debug(typex, filex, funcx, msgx)
 	typ := int(typex)
 	file := cgopp.GoString(voidptr(filex))
 	funcname := cgopp.GoString(voidptr(funcx))
@@ -330,7 +339,7 @@ func QStackViewof(ptr voidptr) QStackView {
 }
 
 func (me QStackView) ReplaceCurrentItem(nextitem QQuickItem) QQuickItem {
-	gopp.Info("todododooooo", nextitem)
+	// gopp.Info("todododooooo", nextitem)
 	sym := dlsym("QQuickStackView_replaceCurrentItem")
 	rv := cgopp.FfiCall[voidptr](sym, me.Cthis, nextitem.Cthis)
 	return QQuickItemof(rv)
