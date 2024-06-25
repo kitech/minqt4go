@@ -55,6 +55,7 @@ void* QVariantToptr(QVariant*p) {
 
 void* QVariantNewBool(bool v) {
     auto rv = new QVariant(v);
+    // qDebug()<<__FUNCTION__<<__LINE__<<v<<*rv<<sizeof(bool);
     return rv;
 }
 bool QVariantTobool(QVariant*p) {
@@ -100,6 +101,7 @@ QObject* QQmlApplicationEngineRootObject1(QQmlApplicationEngine*e) {
 
 // quick templates
 // 6.7 添加了许多方法,但是android的qtsdk现在还是6.6的...
+// aqtinstall 大概在6.15日左右发布新版本,支持qt6.7sdk for android了
 #include <QtQuickTemplates2/private/qquickstackview_p.h>
 void dummyyy() {
     QQuickStackView *stkwin; // not work

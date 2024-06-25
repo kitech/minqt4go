@@ -147,12 +147,17 @@ func dlsym(name string) voidptr {
 }
 func Dlsym0(name string) voidptr { return dlsym(name) }
 
-type QObject struct {
+type QObjectst struct {
 	Cthis voidptr
 }
+type QObject = *QObjectst
 
 func QObjectof(ptr voidptr) QObject {
-	return QObject{ptr}
+	return &QObjectst{ptr}
+}
+func (me QObject) SetCthis(ptr voidptr) QObject {
+	me.Cthis = ptr
+	return me
 }
 
 // why slow, 1ms?
@@ -268,7 +273,8 @@ func QVarintNew[T int | int64 | string | voidptr | bool](vx T) QVariant {
 		return QVariantof(rv)
 	case bool:
 		sym := dlsym("QVariantNewBool")
-		rv := cgopp.Litfficallg(sym, v)
+		// rv := cgopp.Litfficallg(sym, v)
+		rv := cgopp.FfiCall[voidptr](sym, v)
 		return QVariantof(rv)
 	}
 
@@ -301,25 +307,39 @@ func (me QVariant) Tobool() bool {
 }
 
 // ////
-type QQuickItem struct {
-	Cthis voidptr
+type QQuickItemst struct {
+	QObject
 }
+type QQuickItem = *QQuickItemst
 
-func QQuickItemof(ptr voidptr) QQuickItem { return QQuickItem{ptr} }
+func QQuickItemof(ptr voidptr) QQuickItem {
+	me := &QQuickItemst{QObjectof(ptr)}
+	return me
+}
 
 // ////
 // 没有C++类型?
-type QStackView struct {
-	Cthis voidptr
+type QStackViewst struct {
+	QObject
+}
+type QStackView = *QStackViewst
+
+func QStackViewof(ptr voidptr) QStackView {
+	me := &QStackViewst{QObjectof(ptr)}
+	return me
 }
 
-func (me QStackView) Replace(curritem, nextitem QQuickItem) {
-	gopp.Info("todododooooo", curritem, nextitem)
+func (me QStackView) ReplaceCurrentItem(nextitem QQuickItem) QQuickItem {
+	gopp.Info("todododooooo", nextitem)
+	sym := dlsym("QQuickStackView_replaceCurrentItem")
+	rv := cgopp.FfiCall[voidptr](sym, me.Cthis, nextitem.Cthis)
+	return QQuickItemof(rv)
 }
-func QStackViewof(ptr voidptr) QStackView { return QStackView{ptr} }
+
 func (me QStackView) Get(idx int) QQuickItem {
 	sym := dlsym("QQuickStackView_get")
 	// rv := cgopp.Litfficallg(sym, me.Cthis, idx)
+	log.Println(sym, me, me.Cthis, idx)
 	rv := cgopp.FfiCall[voidptr](sym, me.Cthis, idx)
 	// gopp.Info("todododooooo", curritem, nextitem)
 	return QQuickItemof(rv)
