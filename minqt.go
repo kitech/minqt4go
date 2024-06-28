@@ -380,3 +380,77 @@ func (me QQmlApplicationEngine) RootObject() QObject {
 	rv := cgopp.Litfficallg(sym, me.Cthis)
 	return QObjectof(rv)
 }
+
+type QArgument struct {
+	Data   voidptr
+	Tyname voidptr // type string, like QVariant/int/double
+}
+
+type QMetaObjectst struct {
+}
+type QMetaObject = *QMetaObjectst
+
+// 用于调用静态方法
+func QMetaObjectof0() QMetaObject {
+	return &QMetaObjectst{}
+}
+
+/*
+# define QMETHOD_CODE  0                        // member type codes
+# define QSLOT_CODE    1
+# define QSIGNAL_CODE  2
+*/
+func QMethodof(name string) string { return fmt.Sprintf("0%s", name) }
+func QSlotof(name string) string   { return fmt.Sprintf("1%s", name) }
+func QSignalof(name string) string { return fmt.Sprintf("2%s", name) }
+
+// todo
+func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) {
+	var argv [3]voidptr
+
+	a0 := &QArgument{}
+	a0.Data = QVarintNew2(123).Cthis
+	a0.Tyname = cgopp.CStringaf("QVariant")
+	argv[0] = (voidptr)(a0)
+
+	for i := 0; i < len(argv) && i < len(args); i++ {
+		// todo
+	}
+
+	// gopp.Println(argv)
+	symname := "QMetaObjectInvokeMethod2"
+	sym := dlsym(symname)
+	name4c := cgopp.CStringaf(slotname)
+	rv := cgopp.Litfficallg(sym, obj.Cthis, name4c, argv[0], argv[1], argv[2])
+	// gopp.Println(rv, sym, slotname)
+	gopp.GOUSED(rv)
+}
+
+// 单独提取出来，因为它要转换参数为QVariant
+// slotname 不需要参数类型，foo(int), 那么直接传递foo
+func (me QMetaObject) InvokeQmlmf(obj QObject, slotname string, args ...any) {
+	var argv [3]voidptr
+
+	a0 := &QArgument{}
+	a0.Data = QVarintNew2(123).Cthis
+	a0.Tyname = cgopp.CStringaf("QVariant")
+	argv[0] = (voidptr)(a0)
+
+	for i := 0; i < len(argv) && i < len(args); i++ {
+		v := QVarintNew2(args[i])
+
+		a := &QArgument{}
+		a.Data = v.Cthis
+		a.Tyname = cgopp.CStringaf("QVariant")
+		argv[i] = (voidptr)(a)
+
+	}
+
+	// gopp.Println(argv)
+	symname := "QMetaObjectInvokeMethod2"
+	sym := dlsym(symname)
+	name4c := cgopp.CStringaf(slotname)
+	rv := cgopp.Litfficallg(sym, obj.Cthis, name4c, argv[0], argv[1], argv[2])
+	// gopp.Println(rv, sym, slotname)
+	gopp.GOUSED(rv)
+}

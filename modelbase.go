@@ -92,8 +92,9 @@ var lmseq int64 = 10000
 
 ////// 以下是与cpp交互的代码
 
-// todo support non ordered
+// support non ordered
 // todo support non dedup
+// todo support ui distroy but model data keep
 type ListModelBase struct {
 	cppimpl voidptr
 	seq     *int64
@@ -233,8 +234,10 @@ func (me *ListModelBase) Data(row, role int) voidptr {
 	}
 	// gopp.Info(rv, me.RoleName(role), dv, ok, row, role, me.datas.Len())
 	if dv != nil {
+
 		v2 := dv.Data(me.RoleName(role))
 		rv = QVarintNew(fmt.Sprintf("%v", v2))
+		// log.Println(reflect.TypeOf(dv), v2)
 	}
 	return rv.Cthis
 }

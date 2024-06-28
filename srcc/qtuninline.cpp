@@ -70,6 +70,23 @@ void QMetaObjectInvokeMethod1(void* fnptrx, void* n) {
     QMetaObject::invokeMethod(o, [fnptr,n]{ fnptr(n); }, Qt::QueuedConnection);
 }
 
+// 可以直接调用Qt slot，以及qml的函数
+int QMetaObjectInvokeMethod2(QObject* obj, char* member, void*val0,void*val1,void*val2) {
+    QGenericReturnArgument qret;
+    QGenericArgument a0;
+    QGenericArgument a1;
+    QGenericArgument a2;
+
+    if (val0 != nullptr) a0 = *((QGenericArgument*)val0);
+    if (val1 != nullptr) a1 = *((QGenericArgument*)val1);
+    if (val2 != nullptr) a2 = *((QGenericArgument*)val2);
+
+    qDebug()<<__FUNCTION__<<__LINE__<<obj<<member<<val0;
+
+    int rv = QMetaObject::invokeMethod(obj, member, Qt::QueuedConnection, qret, a0, a1, a2);
+    return rv;
+}
+
 QObject* QObjectFindChild1(QObject*obj, char*str) {
     auto rv = obj->findChild<QObject*>(str);
     return rv;

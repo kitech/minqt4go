@@ -28,6 +28,7 @@ bool QVariantTobool(QVariant*p);
 
 
 void QMetaObjectInvokeMethod1(void* fnptrx, void* n);
+int QMetaObjectInvokeMethod2(QObject* obj, char* member, void*a0, void*a1, void*a2);
 
 QObject* QObjectFindChild1(QObject*obj, char*str);
 QVariant* QObjectProperty1(QObject*obj, char*str);
