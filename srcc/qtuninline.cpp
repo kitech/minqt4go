@@ -63,6 +63,8 @@ bool QVariantTobool(QVariant*p) {
 }
 
 ///////////
+// for QtObject::createQmlObject, or other also ok
+void QObjectDtor(QObject* o) { delete o; }
 
 void QMetaObjectInvokeMethod1(void* fnptrx, void* n) {
     QObject* o = qApp;
@@ -81,7 +83,7 @@ int QMetaObjectInvokeMethod2(QObject* obj, char* member, void*val0,void*val1,voi
     if (val1 != nullptr) a1 = *((QGenericArgument*)val1);
     if (val2 != nullptr) a2 = *((QGenericArgument*)val2);
 
-    qDebug()<<__FUNCTION__<<__LINE__<<obj<<member<<val0;
+    // qDebug()<<__FUNCTION__<<__LINE__<<obj<<member<<val0;
 
     int rv = QMetaObject::invokeMethod(obj, member, Qt::QueuedConnection, qret, a0, a1, a2);
     return rv;
@@ -114,6 +116,27 @@ void QQmlApplicationEngineLoad1(QQmlApplicationEngine*e, char*str) {
 QObject* QQmlApplicationEngineRootObject1(QQmlApplicationEngine*e) {
     auto objs = e->rootObjects();
     return objs.value(0);
+}
+
+QQmlComponent* QQmlComponentNew1(void*engine, QObject* parent) {
+    auto rv = new QQmlComponent((QQmlEngine*)engine, parent);
+    return rv;
+}
+QObject* QQmlComponentCreate(QQmlComponent*o, void*ctx) {
+    auto rv = o->create((QQmlContext*)ctx);
+    return rv;
+}
+void QQmlComponentSetData(QQmlComponent*o, char*data) {
+    o->setData(QByteArray(data), QUrl());
+}
+
+#include <QtQml/private/qqmlbuiltinfunctions_p.h>
+QtObject* QtObjectCreate(QQmlEngine*e) { return QtObject::create(e,e); }
+
+QObject* QtObjectCreateQmlObject(void*o, char* qmltxt, QObject*parent) {
+    auto o2 = (QtObject*)o;
+    auto rv = o2->createQmlObject(QString(qmltxt), parent);
+    return rv;
 }
 
 // quick templates

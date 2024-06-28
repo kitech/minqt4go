@@ -59,7 +59,8 @@ func (me *ListModelBase) Add(d Datar) bool {
 		inspos = me.datas.BinFind(d, modeldatacmper)
 	}
 	// log.Println(inspos, d.OrderKey(), d.DedupKey())
-	me.BeginChangeRows(me.datas.Count(), me.datas.Count(), false)
+	// me.BeginChangeRows(me.datas.Count(), me.datas.Count(), false)
+	me.BeginChangeRows(inspos, inspos, false)
 	// ok := me.datas.Put(d.DedupKey(), d)
 	ok := me.datas.InsertAt(inspos, d.DedupKey(), d)
 	me.EndChangeRows(false)
@@ -67,6 +68,19 @@ func (me *ListModelBase) Add(d Datar) bool {
 	}
 
 	return true
+}
+
+func (me *ListModelBase) Delold(n int) {
+	oldcnt1 := me.datas.Len()
+	oldcnt2 := me.RowCount()
+	me.BeginChangeRows(0, n-1, true)
+	me.datas.DelIndexN2(0, n)
+	me.EndChangeRows(true)
+	newcnt1 := me.datas.Len()
+	newcnt2 := me.RowCount()
+
+	gopp.TruePrint(false, fmt.Sprintf("under %d=>%d, ups %d=>%d", oldcnt1, newcnt1, oldcnt2, newcnt2))
+
 }
 
 // like coloumn but in list

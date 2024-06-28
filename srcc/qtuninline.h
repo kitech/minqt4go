@@ -6,6 +6,7 @@ class QVariant;
 class QQmlApplicationEngine;
 class QQuickItem;
 class QQuickStackView;
+class QQmlComponent;
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,6 +28,7 @@ void* QVariantNewBool(bool v);
 bool QVariantTobool(QVariant*p);
 
 
+void QObjectDtor(QObject* o);
 void QMetaObjectInvokeMethod1(void* fnptrx, void* n);
 int QMetaObjectInvokeMethod2(QObject* obj, char* member, void*a0, void*a1, void*a2);
 
@@ -37,6 +39,13 @@ QVariant* QObjectProperty1(QObject*obj, char*str);
 QQmlApplicationEngine* QQmlApplicationEngineNew();
 void QQmlApplicationEngineLoad1(QQmlApplicationEngine*e, char*str);
 QObject* QQmlApplicationEngineRootObject1(QQmlApplicationEngine*e);
+
+QQmlComponent* QQmlComponentNew1(void*engine, QObject* parent);
+QObject* QQmlComponentCreate(QQmlComponent*o, void*ctx);
+void QQmlComponentSetData(QQmlComponent*o, char*data);
+QObject* QtObjectCreateQmlObject(void*o, char* qmltxt, QObject*parent);
+class QtObject;
+QtObject* QtObjectCreate(QQmlEngine*e);
 
 // quick templates2
 QQuickItem* QQuickStackView_get(QQuickStackView*me, int idx);

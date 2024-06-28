@@ -381,6 +381,54 @@ func (me QQmlApplicationEngine) RootObject() QObject {
 	return QObjectof(rv)
 }
 
+// //////
+type QQmlComponentst struct {
+	QObject
+}
+type QQmlComponent = *QQmlComponentst
+
+func QQmlComponentof(ptr voidptr) QQmlComponent {
+	me := &QQmlComponentst{}
+	me.SetCthis(ptr)
+	return me
+}
+
+// todo
+func QQmlComponentNew() {
+
+}
+
+type QtObjectst struct {
+	QObject
+}
+type QtObject = *QtObjectst
+
+// how get QtObject instance??? just call QtObject::create
+func QtObjectof(ptr voidptr) QtObject {
+	me := &QtObjectst{QObjectof(ptr)}
+	return me
+}
+
+func QtObjectCreate(e QQmlApplicationEngine) QtObject {
+	symname := "QtObjectCreate"
+	sym := dlsym(symname)
+
+	rv := cgopp.Litfficallg(sym, e.Cthis)
+	return QtObjectof(rv)
+}
+
+func (me QtObject) CreateQmlObject(qmltxt string, parent QObject) QObject {
+	symname := "QtObjectCreateQmlObject"
+	sym := dlsym(symname)
+
+	qmltxt4c := cgopp.CStringaf(qmltxt)
+	rv := cgopp.Litfficallg(sym, me.Cthis, qmltxt4c, parent.Cthis)
+
+	return QObjectof(rv)
+}
+
+//////////
+
 type QArgument struct {
 	Data   voidptr
 	Tyname voidptr // type string, like QVariant/int/double
