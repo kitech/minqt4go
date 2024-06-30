@@ -231,7 +231,7 @@ func QVariantof(ptr voidptr) QVariant {
 
 func (me QVariant) Dtor() {
 	sym := dlsym("QVariantDtor")
-	// log.Println(sym, me)
+	// log.Println(sym, me.Cthis)
 	cgopp.Litfficallg(sym, me.Cthis)
 	me.cnt++
 }
@@ -480,15 +480,18 @@ func (me QMetaObject) InvokeQmlmf(obj QObject, slotname string, args ...any) {
 	var argv [3]voidptr
 
 	a0 := &QArgument{}
-	a0.Data = QVarintNew2(123).Cthis
-	a0.Tyname = cgopp.CStringaf("QVariant")
-	argv[0] = (voidptr)(a0)
+	if false {
+		a0.Data = QVarintNew2(123).Cthis
+		a0.Tyname = cgopp.CStringaf("QVariant")
+		argv[0] = (voidptr)(a0)
+	}
 
 	for i := 0; i < len(argv) && i < len(args); i++ {
 		v := QVarintNew2(args[i])
 
 		a := &QArgument{}
 		a.Data = v.Cthis
+		// a.Tyname = cgopp.StrtoRefc("QVariant")
 		a.Tyname = cgopp.CStringaf("QVariant")
 		argv[i] = (voidptr)(a)
 
@@ -497,8 +500,15 @@ func (me QMetaObject) InvokeQmlmf(obj QObject, slotname string, args ...any) {
 	// gopp.Println(argv)
 	symname := "QMetaObjectInvokeMethod2"
 	sym := dlsym(symname)
-	name4c := cgopp.CStringaf(slotname)
+	name4c := cgopp.StrtoRefc(&slotname)
+	// log.Println(args, slotname, argv)
 	rv := cgopp.Litfficallg(sym, obj.Cthis, name4c, argv[0], argv[1], argv[2])
 	// gopp.Println(rv, sym, slotname)
 	gopp.GOUSED(rv)
+}
+
+// todo how simple get root object
+func Qmljsgc2(robj QObject) {
+	me := QMetaObjectof0()
+	me.InvokeQmlmf(robj, "jsgc")
 }
