@@ -34,18 +34,16 @@ type Datar interface {
 	OrderKey() int64
 }
 
-// v in [v0, v1], return 0
-// v gt [v0, v1], return 1
-// v lt [v0, v1], return -1
-// v0 <= v1
-func modeldatacmper(v Datar, v0, v1 Datar) int {
-	if v.OrderKey() >= v0.OrderKey() && v.OrderKey() <= v1.OrderKey() {
-		return 0
-	} else if v.OrderKey() < v0.OrderKey() {
-		return -1
-	} else {
+// v0 = v1, return 0
+// v0 gt v1, return 1
+// v0 lt v1, return -1
+func modeldatacmper(v0, v1 Datar) int {
+	if v0.OrderKey() > v1.OrderKey() {
 		return 1
+	} else if v0.OrderKey() < v1.OrderKey() {
+		return -1
 	}
+	return 0
 }
 
 // todo batch add
@@ -129,7 +127,7 @@ func ListModelBaseof(seqptrx int64) *ListModelBase {
 
 //export goimplListModelBaseNew
 func goimplListModelBaseNew(px voidptr) int64 {
-	gopp.Info(px)
+	gopp.NilPrint(px, px)
 	me := ListModelBaseNew()
 	me.cppimpl = px
 
@@ -180,7 +178,7 @@ func (me *ListModelBase) Dtor() {
 
 //export goimplListModelBaseGetsetClazz
 func goimplListModelBaseGetsetClazz(px int64, c voidptr, set int) voidptr {
-	gopp.Info(px, c, set, cgopp.GoString(c))
+	gopp.TruePrint(px == 0 || c == nil, c, set, cgopp.GoString(c))
 	me := ListModelBaseof(px)
 	if set == 1 {
 		me.clazz = cgopp.GoString(c)

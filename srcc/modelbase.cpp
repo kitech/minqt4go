@@ -75,7 +75,7 @@ ListModelBase::~ListModelBase() {
 // }
 
 void ListModelBase::mySetObjectName(const QString& c){
-    qDebug()<<__FUNCTION__<<c;
+    // qDebug()<<__FUNCTION__<<__LINE__<<c;
     // QAbstractListModel::setObjectName(c);
 
     typedef char* (*fnty)(qint64, char*, int);
