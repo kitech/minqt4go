@@ -5,7 +5,9 @@ import (
 	"testing"
 )
 
-func TestQVarint1(t *testing.T) {
+func TestQVarint1(t *testing.T) { TestQVarint2() }
+
+func TestQVarint2() {
 
 	v := QVarintNew(12345)
 	// log.Println(v)

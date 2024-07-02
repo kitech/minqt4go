@@ -14,6 +14,7 @@ extern "C" {
 
 // core
 const char* QCompileVersion();
+
 void QVariantDtor(void*p);
 void* QVariantNewInt(int v);
 int QVariantToint(QVariant*p);
@@ -27,6 +28,9 @@ void* QVariantToptr(QVariant*p);
 void* QVariantNewBool(bool v);
 bool QVariantTobool(QVariant*p);
 
+
+void QStringDtor(void*px);
+void* QStringNew(const char*p);
 
 void QObjectDtor(QObject* o);
 void QMetaObjectInvokeMethod1(void* fnptrx, void* n);

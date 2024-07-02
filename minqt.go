@@ -168,6 +168,7 @@ func (me QObject) SetCthis(ptr voidptr) QObject {
 	me.Cthis = ptr
 	return me
 }
+func (me QObject) Isnil() bool { return me == nil || me.Cthis == nil }
 
 // why slow, 1ms?
 func (me QObject) SetProperty(name string, valuex any) bool {
@@ -315,6 +316,28 @@ func (me QVariant) Tobool() bool {
 	return usize(rv) != 0
 }
 
+type QStringst struct {
+	Cthis voidptr
+}
+type QString = *QStringst
+
+func (me QString) Dtor() {
+	sym := dlsym("QStringDtor")
+	cgopp.Litfficallg(sym, me.Cthis)
+}
+func QStringof(ptr voidptr) QString {
+	me := &QStringst{ptr}
+
+	time.AfterFunc(gopp.DurandSec(3, 5), me.Dtor)
+	return me
+}
+func QStringNew(s string) QString {
+	sym := dlsym("QStringNew")
+	s4c := cgopp.StrtoRefc(&s)
+	rv := cgopp.Litfficallg(sym, s4c)
+	return QStringof(rv)
+}
+
 // ////
 type QQuickItemst struct {
 	QObject
@@ -455,14 +478,41 @@ func QSignalof(name string) string { return fmt.Sprintf("2%s", name) }
 // todo
 func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) {
 	var argv [3]voidptr
+	var addrs [3]voidptr
 
 	a0 := &QArgument{}
-	a0.Data = QVarintNew2(123).Cthis
-	a0.Tyname = cgopp.CStringaf("QVariant")
-	argv[0] = (voidptr)(a0)
+	if false {
+		a0.Data = QVarintNew2(123).Cthis
+		a0.Tyname = cgopp.CStringaf("QVariant")
+		argv[0] = (voidptr)(a0)
+	}
 
 	for i := 0; i < len(argv) && i < len(args); i++ {
 		// todo
+		a := &QArgument{}
+		a.Data = (voidptr)(&args[i])
+		// a.Data = v.Cthis
+		// a.Tyname = cgopp.StrtoRefc("QVariant")
+		// aty := reflect.TypeOf(args[i])
+		vx := (*cgopp.GoIface)(voidptr(&args[i]))
+		switch v := args[i].(type) {
+		case string:
+			addrs[i] = cgopp.CStringaf(v)
+			a.Data = (voidptr)(&(addrs[i]))
+			a.Tyname = cgopp.CStringaf("const char *")
+		case int:
+			addrs[i] = vx.Data
+			a.Data = vx.Data
+			a.Tyname = cgopp.CStringaf("int")
+		case float64:
+			addrs[i] = vx.Data
+			a.Data = vx.Data
+			a.Tyname = cgopp.CStringaf("double")
+
+		}
+		// a.Tyname = cgopp.CStringaf("QVariant")
+
+		argv[i] = (voidptr)(a)
 	}
 
 	// gopp.Println(argv)

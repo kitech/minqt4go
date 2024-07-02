@@ -62,6 +62,15 @@ bool QVariantTobool(QVariant*p) {
     return p->toBool();
 }
 
+void QStringDtor(void*px) {
+    auto p = (QString*)(px);
+    delete p;
+}
+void* QStringNew(const char*p) {
+    auto rv = new QString(p);
+    return (void*)rv;
+}
+
 ///////////
 // for QtObject::createQmlObject, or other also ok
 void QObjectDtor(QObject* o) { delete o; }

@@ -2,6 +2,7 @@ package minqt
 
 import (
 	"fmt"
+	"log"
 	"sync/atomic"
 
 	"github.com/ebitengine/purego"
@@ -68,6 +69,11 @@ func (me *ListModelBase) Add(d Datar) bool {
 	return true
 }
 
+func (me *ListModelBase) Update(d Datar) bool {
+	// me.datas.Del()
+	return true
+}
+
 func (me *ListModelBase) Delold(n int) {
 	oldcnt1 := me.datas.Len()
 	oldcnt2 := me.RowCount()
@@ -79,6 +85,16 @@ func (me *ListModelBase) Delold(n int) {
 
 	gopp.TruePrint(false, fmt.Sprintf("under %d=>%d, ups %d=>%d", oldcnt1, newcnt1, oldcnt2, newcnt2))
 
+}
+
+func (me *ListModelBase) Clear() {
+	cnt := me.RowCount()
+	if cnt == 0 {
+		return
+	}
+	me.BeginChangeRows(0, cnt-1, true)
+	me.datas.Clear()
+	me.EndChangeRows(true)
 }
 
 // like coloumn but in list
@@ -177,11 +193,15 @@ func (me *ListModelBase) Dtor() {
 // }
 
 //export goimplListModelBaseGetsetClazz
-func goimplListModelBaseGetsetClazz(px int64, c voidptr, set int) voidptr {
-	gopp.TruePrint(px == 0 || c == nil, c, set, cgopp.GoString(c))
+func goimplListModelBaseGetsetClazz(px int64, clzx voidptr, set int) voidptr {
+	clz := cgopp.GoString(clzx)
+	gopp.TruePrint(px == 0 || clzx == nil, clzx, set, clz)
+	if false && set > 0 {
+		log.Println("init model", px, clzx, clz, set)
+	}
 	me := ListModelBaseof(px)
 	if set == 1 {
-		me.clazz = cgopp.GoString(c)
+		me.clazz = clz
 	} else {
 		return cgopp.CStringaf(me.clazz)
 	}
@@ -252,6 +272,14 @@ func (me *ListModelBase) Data(row, role int) voidptr {
 		// log.Println(reflect.TypeOf(dv), v2)
 	}
 	return rv.Cthis
+}
+
+func (me *ListModelBase) Data2(row int) Datar {
+	_, dv, ok := me.datas.GetIndex(row)
+	if !ok {
+	}
+	// gopp.Info(rv, me.RoleName(role), dv, ok, row, role, me.datas.Len())
+	return dv
 }
 
 func (me *ListModelBase) BeginChangeRows(first, last int, remove bool) {
