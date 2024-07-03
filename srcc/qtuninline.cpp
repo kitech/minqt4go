@@ -62,6 +62,17 @@ bool QVariantTobool(QVariant*p) {
     return p->toBool();
 }
 
+void* QVariantNewDouble(double v) {
+    auto rv = new QVariant(v);
+    return rv;
+}
+int QVariantToDouble(QVariant*p, double* v) {
+    auto rv = p->toDouble();
+    *v = rv;
+    return 1;
+}
+
+
 void QStringDtor(void*px) {
     auto p = (QString*)(px);
     delete p;
@@ -112,6 +123,32 @@ QVariant* QObjectProperty1(QObject*obj, char*str) {
     // qDebug()<<__FUNCTION__<<__LINE__<<*rv2<<QString(str)<<(*rv2).data();
     return rv2;
 }
+
+// 适用于 qml attached property
+QQmlProperty* QQmlPropertyNew1(QObject*obj, char*name, void*qe) {
+    // qDebug()<<__FUNCTION__<<__LINE__<<obj<<name<<qe;
+    if (qe == nullptr) {
+        auto ctx = QQmlEngine::contextForObject(obj);
+        auto rv = new QQmlProperty(obj, QString(name), ctx);
+        return rv;
+    }else{
+        auto ctx = QQmlEngine::contextForObject(obj);
+        // auto rv = new QQmlProperty(obj, QString(name), (QQmlEngine*)qe);
+        auto rv = new QQmlProperty(obj, QString(name), ctx);
+        return rv;
+    }
+}
+void QQmlPropertyDtor(QQmlProperty*obj) { delete obj; }
+QVariant* QQmlPropertyRead(QQmlProperty*obj) {
+    auto rv = obj->read();
+    // qDebug()<<__FUNCTION__<<__LINE__<<rv<<obj->name()<<obj->isValid();
+    return new QVariant(rv);
+}
+int QQmlPropertyWrite(QQmlProperty*obj, QVariant*val) {
+    auto rv = obj->write(*val);
+    return rv;
+}
+
 
 // qml
 QQmlApplicationEngine* QQmlApplicationEngineNew() {

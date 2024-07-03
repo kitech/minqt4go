@@ -211,6 +211,52 @@ func (me QObject) FindChild(objname string) QObject {
 	return QObjectof(rv)
 }
 
+// 适用于 qml attached property
+// eg. ToolTip.text
+// eg. ScrollBar.vertical
+// QQmlProperty* QQmlPropertyNew1(QObject*obj, char*name, void*qe);
+// void QQmlPropertyDtor(QQmlProperty*obj);
+// QVariant* QQmlPropertyRead(QQmlProperty*obj);
+// int QQmlPropertyWrite(QQmlProperty*obj, QVariant*val);
+
+type QQmlPropertyst struct {
+	Cthis voidptr
+}
+type QQmlProperty = *QQmlPropertyst
+
+// 自动dtor，3-8sec
+func QQmlPropertyof(ptr voidptr) QQmlProperty {
+	me := &QQmlPropertyst{}
+	me.Cthis = ptr
+
+	time.AfterFunc(gopp.DurandSec(3, 5), me.Dtor)
+	return me
+}
+func (me QQmlProperty) Dtor() {
+	sym := dlsym("QQmlPropertyDtor")
+	cgopp.Litfficallg(sym, me.Cthis)
+}
+
+func (me QObject) QmlProperty(name string) QQmlProperty {
+	fnsym := dlsym("QQmlPropertyNew1")
+	name4c := cgopp.StrtoRefc(&name)
+	// log.Println(fnsym, me, name4c)
+	rv := cgopp.Litfficallg(fnsym, me.Cthis, name4c, nil)
+	return QQmlPropertyof(rv)
+}
+func (me QQmlProperty) Read() QVariant {
+	fnsym := dlsym("QQmlPropertyRead")
+	rv := cgopp.Litfficallg(fnsym, me.Cthis)
+	return QVariantof(rv)
+}
+func (me QQmlProperty) Write(valx any) bool {
+	fnsym := dlsym("QQmlPropertyWrite")
+	val := QVarintNew2(valx)
+	rv := cgopp.Litfficallg(fnsym, me.Cthis, val.Cthis)
+	return cgopp.C2goBool(usize(rv))
+}
+
+// ////
 type QVariant struct {
 	Cthis voidptr
 	cnt   int
@@ -256,7 +302,7 @@ func QVarintNew2(vx any) QVariant {
 	// time.AfterFunc(gopp.DurandSec(3, 5), vp.Dtor)
 	return vp
 }
-func QVarintNew[T int | int64 | string | voidptr | bool](vx T) QVariant {
+func QVarintNew[T int | int64 | string | voidptr | bool | float64](vx T) QVariant {
 	// log.Println(reflect.TypeOf(any(vx)), vx)
 	switch v := any(vx).(type) {
 	case int:
@@ -286,6 +332,12 @@ func QVarintNew[T int | int64 | string | voidptr | bool](vx T) QVariant {
 		// rv := cgopp.Litfficallg(sym, v)
 		rv := cgopp.FfiCall[voidptr](sym, v)
 		return QVariantof(rv)
+	case float64:
+		fnsym := dlsym("QVariantNewDouble")
+		rv := cgopp.FfiCall[voidptr](fnsym, v)
+		return QVariantof(rv)
+	default:
+		gopp.Warn("wtf", vx)
 	}
 
 	return QVariant{}
@@ -314,6 +366,13 @@ func (me QVariant) Tobool() bool {
 	sym := dlsym("QVariantTobool")
 	rv := cgopp.Litfficallg(sym, me.Cthis)
 	return usize(rv) != 0
+}
+func (me QVariant) ToDouble() float64 {
+	sym := dlsym("QVariantToDouble")
+	var v float64
+	rv := cgopp.Litfficallg(sym, me.Cthis, voidptr(&v))
+	gopp.GOUSED(rv)
+	return v
 }
 
 type QStringst struct {

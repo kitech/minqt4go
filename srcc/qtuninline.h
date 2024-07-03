@@ -7,6 +7,7 @@ class QQmlApplicationEngine;
 class QQuickItem;
 class QQuickStackView;
 class QQmlComponent;
+class QQmlProperty;
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,7 +28,8 @@ void* QVariantToptr(QVariant*p);
 // void* QVariantNewListstr();
 void* QVariantNewBool(bool v);
 bool QVariantTobool(QVariant*p);
-
+void* QVariantNewDouble(double v);
+int QVariantToDouble(QVariant*p, double* v);
 
 void QStringDtor(void*px);
 void* QStringNew(const char*p);
@@ -38,6 +40,12 @@ int QMetaObjectInvokeMethod2(QObject* obj, char* member, void*a0, void*a1, void*
 
 QObject* QObjectFindChild1(QObject*obj, char*str);
 QVariant* QObjectProperty1(QObject*obj, char*str);
+
+// 适用于 qml attached property
+QQmlProperty* QQmlPropertyNew1(QObject*obj, char*name, void*qe);
+void QQmlPropertyDtor(QQmlProperty*obj);
+QVariant* QQmlPropertyRead(QQmlProperty*obj);
+int QQmlPropertyWrite(QQmlProperty*obj, QVariant*val);
 
 // qml
 QQmlApplicationEngine* QQmlApplicationEngineNew();
