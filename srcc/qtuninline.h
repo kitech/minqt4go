@@ -1,8 +1,10 @@
 #ifndef _QTUNINLINE_H_
 #define _QTUNINLINE_H_
 
-class QObject;
+class QString;
 class QVariant;
+class QMetaObject;
+class QObject;
 class QQmlApplicationEngine;
 class QQuickItem;
 class QQuickStackView;
@@ -14,6 +16,8 @@ extern "C" {
 #endif
 
 // core
+void* uninlineholder();
+
 const char* QCompileVersion();
 
 void QVariantDtor(void*p);
@@ -33,6 +37,7 @@ int QVariantToDouble(QVariant*p, double* v);
 
 void QStringDtor(void*px);
 void* QStringNew(const char*p);
+const char* QStringToutf8(QString* sp);
 
 void QObjectDtor(QObject* o);
 void QMetaObjectInvokeMethod1(void* fnptrx, void* n);
@@ -40,6 +45,7 @@ int QMetaObjectInvokeMethod2(QObject* obj, char* member, void*a0, void*a1, void*
 
 QObject* QObjectFindChild1(QObject*obj, char*str);
 QVariant* QObjectProperty1(QObject*obj, char*str);
+const char* QObjectObjectName(QObject*obj);
 
 // 适用于 qml attached property
 QQmlProperty* QQmlPropertyNew1(QObject*obj, char*name, void*qe);

@@ -7,6 +7,15 @@
 
 #include "qtuninline.h"
 
+void* uninlineholder() {
+#define nilobj(x) ((x*)0)
+    if (nilobj(QObject)->metaObject()!=nullptr) { }
+    if (nilobj(QMetaObject)->className()!=nullptr) {}
+    if (nilobj(QVariant)->isValid()) {}
+
+    return nullptr;
+}
+
 const char* QCompileVersion() { return QT_VERSION_STR; }
 
 // __attribute__((noinline))
@@ -81,6 +90,7 @@ void* QStringNew(const char*p) {
     auto rv = new QString(p);
     return (void*)rv;
 }
+const char* QStringToutf8(QString* sp) { return qUtf8Printable((*sp)); }
 
 ///////////
 // for QtObject::createQmlObject, or other also ok
@@ -122,6 +132,10 @@ QVariant* QObjectProperty1(QObject*obj, char*str) {
     auto rv2 = new QVariant(rv); //
     // qDebug()<<__FUNCTION__<<__LINE__<<*rv2<<QString(str)<<(*rv2).data();
     return rv2;
+}
+const char* QObjectObjectName(QObject*obj) {
+    auto rv = obj->objectName();
+    return qUtf8Printable(rv);
 }
 
 // 适用于 qml attached property
@@ -210,3 +224,4 @@ QQuickItem* QQuickStackView_replaceCurrentItem(QQuickStackView* me, QQuickItem* 
 void* cgoir_dlsym0(const char* name) {
     return dlsym(RTLD_DEFAULT, name);
 }
+

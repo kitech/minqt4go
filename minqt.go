@@ -121,7 +121,7 @@ func qtMsgoutput(typ int, file, funcname, msg string) bool {
 }
 
 //export qtMessageOutputGoimpl
-func qtMessageOutputGoimpl(typex C.int, filex *C.char, funcx *C.char, msgx *C.char) {
+func qtMessageOutputGoimpl(typex cint, filex charptr, funcx charptr, msgx charptr) {
 	// gopp.Debug(typex, filex, funcx, msgx)
 	typ := int(typex)
 	file := cgopp.GoString(voidptr(filex))
@@ -183,7 +183,6 @@ func (me QObject) SetProperty(name string, valuex any) bool {
 	// name4c := cgopp.CString(name)
 	// defer cgopp.Cfree(name4c)
 	rv := cgopp.Litfficallg(sym, me.Cthis, name4c, value.Cthis)
-	// log.Println(rv)
 	gopp.GOUSED(rv)
 	return true
 }
@@ -197,8 +196,10 @@ func (me QObject) Property(name string) QVariant {
 	// defer cgopp.Cfree(name4c)
 	name4c := cgopp.StrtoRefc(&name)
 	rv := cgopp.Litfficallg(sym, me.Cthis, name4c)
-	// log.Println(rv)
-	return QVariantof(rv)
+	gopp.NilPrint(rv, name, me.Dbgstr())
+	qv := QVariantof(rv)
+	gopp.FalsePrint(qv.Valid(), "Invalid", name, me.Dbgstr())
+	return qv
 }
 func (me QObject) FindChild(objname string) QObject {
 
@@ -207,8 +208,41 @@ func (me QObject) FindChild(objname string) QObject {
 	// on4c := cgopp.CString(objname)
 	// defer cgopp.Cfree(on4c)
 	rv := cgopp.Litfficallg(sym, me.Cthis, on4c)
-	// log.Println(rv)
+	gopp.NilPrint(rv, "fc404", objname, me.Dbgstr())
+
 	return QObjectof(rv)
+}
+
+// todo maybe
+func (me QObject) Dbgstr() string {
+	// todo like this: Aboutui_QMLTYPE_36(0x7fb528417530, name = "aboutui")
+	// objname := me.Property("objectName").Tostr()
+	objname := me.ObjectName()
+	mtobj := me.MetaObject()
+	clsname := mtobj.ClassName()
+	s := fmt.Sprintf("%s(%v, name = \"%s\")", clsname, me.Cthis, objname)
+	return s
+}
+func (me QObject) MetaObject() QMetaObject {
+	fnsym := dlsym("_ZNK7QObject10metaObjectEv")
+	rv := cgopp.Litfficallg(fnsym, me.Cthis)
+	return QMetaObjectof(rv)
+}
+
+// 测试C++返回record,结果正确
+// C++ 返回record的机制，转换为给第一参数传递caller申请的内存
+// 难道android上不是这样的？？？果然是的，android上崩溃
+func (me QObject) ObjectName() string {
+	if true {
+		fnsym := dlsym("QObjectObjectName")
+		rv := cgopp.Litfficallg(fnsym, me.Cthis)
+		return cgopp.GoString(rv)
+	}
+	fnsym := dlsym("_ZNK7QObject10objectNameEv")
+	var rv voidptr = cgopp.Malloc(128)
+	cgopp.Litfficallg(fnsym, rv, me.Cthis)
+	var s = QStringof(rv)
+	return s.Toutf8()
 }
 
 // 适用于 qml attached property
@@ -374,6 +408,11 @@ func (me QVariant) ToDouble() float64 {
 	gopp.GOUSED(rv)
 	return v
 }
+func (me QVariant) Valid() bool {
+	fnsym := dlsym("_ZNK8QVariant7isValidEv")
+	rv := cgopp.Litfficallg(fnsym, me.Cthis)
+	return usize(rv) != 0
+}
 
 type QStringst struct {
 	Cthis voidptr
@@ -395,6 +434,15 @@ func QStringNew(s string) QString {
 	s4c := cgopp.StrtoRefc(&s)
 	rv := cgopp.Litfficallg(sym, s4c)
 	return QStringof(rv)
+}
+
+func (me QString) Toutf8() string {
+	fnsym := dlsym("QStringToutf8")
+	// rv it's a ref, dont free/modify, only copy
+	rv := cgopp.Litfficallg(fnsym, me.Cthis)
+	s := cgopp.GoString(rv)
+
+	return s
 }
 
 // ////
@@ -517,12 +565,21 @@ type QArgument struct {
 }
 
 type QMetaObjectst struct {
+	Cthis voidptr
 }
 type QMetaObject = *QMetaObjectst
 
 // 用于调用静态方法
 func QMetaObjectof0() QMetaObject {
 	return &QMetaObjectst{}
+}
+func QMetaObjectof(ptr voidptr) QMetaObject {
+	return &QMetaObjectst{ptr}
+}
+func (me QMetaObject) ClassName() string {
+	fnsym := dlsym("_ZNK11QMetaObject9classNameEv")
+	rv := cgopp.Litfficallg(fnsym, me.Cthis)
+	return cgopp.GoString(rv)
 }
 
 /*
