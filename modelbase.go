@@ -70,8 +70,24 @@ func (me *ListModelBase) Add(d Datar) bool {
 }
 
 func (me *ListModelBase) Update(d Datar) bool {
-	// me.datas.Del()
-	return true
+
+	idx := me.datas.Indexof(d.DedupKey())
+	gopp.TruePrint(idx < 0, "notfound", d.DedupKey())
+	if idx > 0 {
+		me.BeginChangeRows(idx, idx, true)
+		me.datas.Del(d.DedupKey())
+		me.EndChangeRows(true)
+
+		ok := me.Add(d)
+
+		return ok
+	}
+	return false
+}
+
+func (me *ListModelBase) Get(key string) (Datar, bool) {
+	d, ok := me.datas.Get(key)
+	return d, ok
 }
 
 func (me *ListModelBase) Delold(n int) {

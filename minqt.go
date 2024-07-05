@@ -24,6 +24,17 @@ import "C"
 
 // inline 的函数/方法就没法搞了。。。
 
+// note: need RunonUithread
+func Exit(v int) {
+	name := "_ZN16QCoreApplication4exitEi"
+	// sym, err := purego.Dlsym(purego.RTLD_DEFAULT, name)
+	// gopp.ErrPrint(err, name)
+	// cgopp.Litfficallg(sym, voidptr(usize(v)))
+	cgopp.FfiCall0[int](name, v)
+
+	// time.AfterFunc(gopp.DurandSec(1, 0), func() { os.Exit(v) })
+}
+
 func QCompVersion() string {
 	rv := call0("QCompileVersion")
 	return cgopp.GoString(rv)
@@ -468,6 +479,7 @@ func QStackViewof(ptr voidptr) QStackView {
 	return me
 }
 
+// return not olditem???
 func (me QStackView) ReplaceCurrentItem(nextitem QQuickItem) QQuickItem {
 	// gopp.Info("todododooooo", nextitem)
 	sym := dlsym("QQuickStackView_replaceCurrentItem")
@@ -591,7 +603,6 @@ func QMethodof(name string) string { return fmt.Sprintf("0%s", name) }
 func QSlotof(name string) string   { return fmt.Sprintf("1%s", name) }
 func QSignalof(name string) string { return fmt.Sprintf("2%s", name) }
 
-// todo
 func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) {
 	var argv [3]voidptr
 	var addrs [3]voidptr
@@ -639,6 +650,9 @@ func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) {
 	// gopp.Println(rv, sym, slotname)
 	gopp.GOUSED(rv)
 }
+func QMOInvoke2(obj QObject, slotname string, args ...any) {
+	QMetaObjectof0().Invoke2(obj, slotname, args...)
+}
 
 // 单独提取出来，因为它要转换参数为QVariant
 // slotname 不需要参数类型，foo(int), 那么直接传递foo
@@ -671,6 +685,9 @@ func (me QMetaObject) InvokeQmlmf(obj QObject, slotname string, args ...any) {
 	rv := cgopp.Litfficallg(sym, obj.Cthis, name4c, argv[0], argv[1], argv[2])
 	// gopp.Println(rv, sym, slotname)
 	gopp.GOUSED(rv)
+}
+func QMOInvokeQmlmf(obj QObject, slotname string, args ...any) {
+	QMetaObjectof0().InvokeQmlmf(obj, slotname, args...)
 }
 
 // todo how simple get root object
