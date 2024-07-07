@@ -102,6 +102,20 @@ func (me *ListModelBase) Delold(n int) {
 	gopp.TruePrint(false, fmt.Sprintf("under %d=>%d, ups %d=>%d", oldcnt1, newcnt1, oldcnt2, newcnt2))
 
 }
+func (me *ListModelBase) Del(key string) bool {
+	oldcnt1 := me.datas.Len()
+	oldcnt2 := me.RowCount()
+
+	idx := me.datas.Indexof(key)
+	me.BeginChangeRows(idx, idx, true)
+	_, delok := me.datas.DelIndex(idx)
+	me.EndChangeRows(true)
+	newcnt1 := me.datas.Len()
+	newcnt2 := me.RowCount()
+
+	gopp.TruePrint(false, fmt.Sprintf("under %d=>%d, ups %d=>%d", oldcnt1, newcnt1, oldcnt2, newcnt2))
+	return delok
+}
 
 func (me *ListModelBase) Clear() {
 	cnt := me.RowCount()

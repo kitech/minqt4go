@@ -1,4 +1,5 @@
 
+
 #include <QtCore>
 #include <QtQml>
 #include <QtQuick>
@@ -6,6 +7,10 @@
 #include <QtQuickTemplates2>
 
 #include "qtuninline.h"
+
+#include <dlfcn.h>
+auto cgoppMallocgcfn = (void* (*)(int))dlsym(RTLD_DEFAULT, "cgoppMallocgc");
+// extern "C" void* cgoppMallocgc(int);
 
 void* uninlineholder() {
 #define nilobj(x) ((x*)0)
@@ -44,8 +49,14 @@ void* QVariantNewStr(char*str) {
     auto rv = new QVariant(QString(str));
     return rv;
 }
+// 有时go获取不到值，可能是dtor太快了
+// 分配新内存解决，但是用的go's mallogc
 char* QVariantTostr(QVariant*p) {
-    return p->toString().toUtf8().data();
+    // qDebug()<<__FUNCTION__<<__LINE__<<p->toString();
+    auto v = p->toString();
+    auto rv = (char*)cgoppMallocgcfn(v.length()+1);
+    strcpy(rv, qUtf8Printable(v));
+    return rv;
 }
 
 QVariant* QVariantNewPtr(void*ptr) {
