@@ -101,7 +101,11 @@ void* QStringNew(const char*p) {
     auto rv = new QString(p);
     return (void*)rv;
 }
-const char* QStringToutf8(QString* sp) { return qUtf8Printable((*sp)); }
+const char* QStringToutf8(QString* sp) {
+    auto rv = (char*)cgoppMallocgcfn(sp->length()*2+1);
+    strcpy(rv, qUtf8Printable((*sp)));
+    return rv;
+}
 
 ///////////
 // for QtObject::createQmlObject, or other also ok
@@ -145,8 +149,10 @@ QVariant* QObjectProperty1(QObject*obj, char*str) {
     return rv2;
 }
 const char* QObjectObjectName(QObject*obj) {
-    auto rv = obj->objectName();
-    return qUtf8Printable(rv);
+    auto rvx = obj->objectName();
+    auto rv = (char*)cgoppMallocgcfn(rvx.length()+1);
+    strcpy(rv, qUtf8Printable(rv));
+    return rv;
 }
 
 // 适用于 qml attached property

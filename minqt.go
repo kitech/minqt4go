@@ -605,7 +605,7 @@ func QSignalof(name string) string { return fmt.Sprintf("2%s", name) }
 
 func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) {
 	var argv [3]voidptr
-	var addrs [3]voidptr
+	var addrs [3]voidptr // 为了取地址使用，另一个作用是保持引用
 
 	a0 := &QArgument{}
 	if false {
@@ -623,10 +623,14 @@ func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) {
 		// aty := reflect.TypeOf(args[i])
 		vx := (*cgopp.GoIface)(voidptr(&args[i]))
 		switch v := args[i].(type) {
-		case string:
-			addrs[i] = cgopp.CStringaf(v)
+		case charptr:
+			addrs[i] = voidptr(v)
 			a.Data = (voidptr)(&(addrs[i]))
-			a.Tyname = cgopp.CStringaf("const char *")
+			a.Tyname = cgopp.CStringaf("const char*")
+		case string:
+			addrs[i] = QStringNew(v).Cthis
+			a.Data = addrs[i]
+			a.Tyname = cgopp.CStringaf("QString")
 		case int:
 			addrs[i] = vx.Data
 			a.Data = vx.Data
@@ -635,6 +639,10 @@ func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) {
 			addrs[i] = vx.Data
 			a.Data = vx.Data
 			a.Tyname = cgopp.CStringaf("double")
+		case bool:
+			addrs[i] = vx.Data
+			a.Data = vx.Data
+			a.Tyname = cgopp.CStringaf("bool")
 
 		}
 		// a.Tyname = cgopp.CStringaf("QVariant")
