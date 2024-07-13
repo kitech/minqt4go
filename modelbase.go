@@ -163,6 +163,24 @@ type ListModelBase struct {
 	datas *gopp.ListMap0[string, Datar]
 }
 
+// logui 和 数据隔离
+// clazz =>
+var sepmdldatas = cmap.New[*gopp.ListMap0[string, Datar]]()
+
+func UnderDatas(clz string) *gopp.ListMap0[string, Datar] {
+	if datas, ok := sepmdldatas.Get(clz); ok {
+		return datas
+	}
+	return nil
+}
+func UnderDatasPrepare(clz string) {
+	if _, ok := sepmdldatas.Get(clz); ok {
+	} else {
+		datas := gopp.ListMap0New[string, Datar]()
+		sepmdldatas.Set(clz, datas)
+	}
+}
+
 func ListModelBaseof(seqptrx int64) *ListModelBase {
 	seqptr := (seqptrx)
 	key := fmt.Sprintf("%d", seqptr)
@@ -196,6 +214,7 @@ func ListModelBaseNew() *ListModelBase {
 //export goimplListModelBaseDtor
 func goimplListModelBaseDtor(px int64) {
 	me := ListModelBaseof(px)
+	gopp.Info(px, me.clazz)
 	me.Dtor()
 }
 func (me *ListModelBase) Dtor() {
@@ -226,12 +245,19 @@ func (me *ListModelBase) Dtor() {
 func goimplListModelBaseGetsetClazz(px int64, clzx voidptr, set int) voidptr {
 	clz := cgopp.GoString(clzx)
 	gopp.TruePrint(px == 0 || clzx == nil, clzx, set, clz)
-	if false && set > 0 {
+	if set > 0 {
 		log.Println("init model", px, clzx, clz, set)
 	}
 	me := ListModelBaseof(px)
 	if set == 1 {
 		me.clazz = clz
+		if clz == "loglstmdl" {
+			if datas, ok := sepmdldatas.Get(clz); ok {
+				me.datas = datas
+			} else {
+				sepmdldatas.Set(clz, me.datas)
+			}
+		}
 	} else {
 		return cgopp.CStringaf(me.clazz)
 	}

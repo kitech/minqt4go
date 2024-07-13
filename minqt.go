@@ -87,6 +87,9 @@ func RunonUithread(f func()) {
 
 	cgopp.Litfficallg(sym, sym2, seq)
 }
+func RunonUithreadx(fx any, args ...any) {
+
+}
 
 // 应该放在minqt包里面
 func SetQtmsgout(f func(typ int, file, funcname, msg string) bool) {
@@ -180,6 +183,12 @@ func (me QObject) SetCthis(ptr voidptr) QObject {
 	return me
 }
 func (me QObject) Isnil() bool { return me == nil || me.Cthis == nil }
+
+func (me QObject) Dtor() {
+	symname := "_ZN7QObjectD2Ev"
+	sym := dlsym(symname)
+	cgopp.Litfficallg(sym, me.Cthis)
+}
 
 // why slow, 1ms?
 func (me QObject) SetProperty(name string, valuex any) bool {
@@ -490,17 +499,20 @@ func (me QStackView) ReplaceCurrentItem(nextitem QQuickItem) QQuickItem {
 func (me QStackView) Get(idx int) QQuickItem {
 	sym := dlsym("QQuickStackView_get")
 	// rv := cgopp.Litfficallg(sym, me.Cthis, idx)
-	log.Println(sym, me, me.Cthis, idx)
+	// log.Println(sym, me, me.Cthis, idx)
 	rv := cgopp.FfiCall[voidptr](sym, me.Cthis, idx)
 	// gopp.Info("todododooooo", curritem, nextitem)
 	return QQuickItemof(rv)
 }
 
 // ////
-type QQmlApplicationEngine struct{ Cthis voidptr }
+type QQmlApplicationEngine struct {
+	// Cthis voidptr
+	QObject
+}
 
 func QQmlApplicationEngineof(ptr voidptr) QQmlApplicationEngine {
-	return QQmlApplicationEngine{ptr}
+	return QQmlApplicationEngine{QObjectof(ptr)}
 }
 func QQmlApplicationEngineNew() QQmlApplicationEngine {
 	// sym := dlsym("_ZN21QQmlApplicationEngineC1EP7QObject")
@@ -702,4 +714,18 @@ func QMOInvokeQmlmf(obj QObject, slotname string, args ...any) {
 func Qmljsgc2(robj QObject) {
 	me := QMetaObjectof0()
 	me.InvokeQmlmf(robj, "jsgc")
+}
+
+func QJSEGC(obj QObject) {
+	symname := "_ZN9QJSEngine14collectGarbageEv"
+	sym := dlsym(symname)
+	rv := cgopp.Litfficallg(sym, obj.Cthis)
+	gopp.GOUSED(rv)
+}
+
+func QJSEOwnership(obj QObject) int {
+	symname := "_ZN9QJSEngine15objectOwnershipEP7QObject"
+	sym := dlsym(symname)
+	rv := cgopp.Litfficallg(sym, obj.Cthis)
+	return int(usize(rv))
 }

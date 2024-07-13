@@ -16,6 +16,7 @@ extern "C" {
 #endif
 
 // core
+char* cxxabi__cxa_demangle(char*a0, char*a1, size_t *length, int *status);
 void* uninlineholder();
 
 const char* QCompileVersion();

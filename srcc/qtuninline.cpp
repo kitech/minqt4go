@@ -1,10 +1,24 @@
-
+#include <cxxabi.h>
 
 #include <QtCore>
+#include <QJSEngine>
 #include <QtQml>
 #include <QtQuick>
 #include <QtQuickControls2>
 #include <QtQuickTemplates2>
+
+// private part
+#include <QtQuickTemplates2/private/qquickstackview_p.h>
+#include <QtQuickTemplates2/private/qquicktoolbutton_p.h>
+#include <QtQuickTemplates2/private/qquickbutton_p.h>
+// #include <QtQuickTemplates2/private/qquicksplitter_p.h>
+#include <QtQml/private/qqmlbuiltinfunctions_p.h>
+#include <QtQuickTemplates2/private/qquickapplicationwindow_p.h>
+#include <QtQuickTemplates2/private/qquickmenu_p.h>
+#include <QtQuickTemplates2/private/qquickaction_p.h>
+#include <QtQuickTemplates2/private/qquicklabel_p.h>
+#include <QtQuickTemplates2/private/qquickmenubar_p.h>
+#include <QtQuickTemplates2/private/qquicktoolbutton_p.h>
 
 #include "qtuninline.h"
 
@@ -12,11 +26,36 @@
 auto cgoppMallocgcfn = (void* (*)(int))dlsym(RTLD_DEFAULT, "cgoppMallocgc");
 // extern "C" void* cgoppMallocgc(int);
 
+char* cxxabi__cxa_demangle(char*a0, char*a1, size_t *length, int *status) {
+    return abi::__cxa_demangle(a0, a1, length, status);
+}
+
+static QString dummyqs("dummy&ref");
 void* uninlineholder() {
 #define nilobj(x) ((x*)0)
+
     if (nilobj(QObject)->metaObject()!=nullptr) { }
     if (nilobj(QMetaObject)->className()!=nullptr) {}
     if (nilobj(QVariant)->isValid()) {}
+    nilobj(QJSEngine)->collectGarbage();
+    nilobj(QJSEngine)->objectOwnership(0);
+    nilobj(QJSEngine)->setObjectOwnership(0, QJSEngine::CppOwnership);
+    
+    nilobj(QQuickMenuBar)->addMenu(0);
+    nilobj(QQuickMenuBar)->setHeight(0);
+    nilobj(QQuickMenuBar)->setWidth(0);
+
+    nilobj(QQuickMenu)->addItem(0);
+    nilobj(QQuickMenu)->addAction(0);
+    nilobj(QQuickMenu)->setTitle(dummyqs); // 这个很奇怪
+
+    nilobj(QQuickAction)->setText(0);
+
+    nilobj(QQuickLabel)->setText(0);
+    nilobj(QQuickButton)->setText(0);
+    nilobj(QQuickToolButton)->setText(0);
+
+
 
     return nullptr;
 }
@@ -219,7 +258,7 @@ QObject* QtObjectCreateQmlObject(void*o, char* qmltxt, QObject*parent) {
 // quick templates
 // 6.7 添加了许多方法,但是android的qtsdk现在还是6.6的...
 // aqtinstall 大概在6.15日左右发布新版本,支持qt6.7sdk for android了
-#include <QtQuickTemplates2/private/qquickstackview_p.h>
+
 void dummyyy() {
     QQuickStackView *stkwin; // not work
 }
