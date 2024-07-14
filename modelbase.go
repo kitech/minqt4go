@@ -251,12 +251,8 @@ func goimplListModelBaseGetsetClazz(px int64, clzx voidptr, set int) voidptr {
 	me := ListModelBaseof(px)
 	if set == 1 {
 		me.clazz = clz
-		if clz == "loglstmdl" {
-			if datas, ok := sepmdldatas.Get(clz); ok {
-				me.datas = datas
-			} else {
-				sepmdldatas.Set(clz, me.datas)
-			}
+		if datas, ok := sepmdldatas.Get(clz); ok {
+			me.datas = datas
 		}
 	} else {
 		return cgopp.CStringaf(me.clazz)

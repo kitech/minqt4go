@@ -5,9 +5,11 @@ go 1.22.3
 require (
 	github.com/ebitengine/purego v0.7.1
 	github.com/kitech/gopp v0.0.0
+	github.com/kitech/gopp/cgopp v0.0.0
 )
 
 replace github.com/kitech/gopp => ../goplusplus
+replace github.com/kitech/gopp/cgopp => ../goplusplus/cgopp
 
 require (
 	github.com/Workiva/go-datastructures v1.1.3 // indirect

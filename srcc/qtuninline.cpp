@@ -14,11 +14,26 @@
 // #include <QtQuickTemplates2/private/qquicksplitter_p.h>
 #include <QtQml/private/qqmlbuiltinfunctions_p.h>
 #include <QtQuickTemplates2/private/qquickapplicationwindow_p.h>
+#include <QtQuick/private/qquickloader_p.h>
+#include <QtQuickTemplates2/private/qquickmenubar_p.h>
 #include <QtQuickTemplates2/private/qquickmenu_p.h>
+#include <QtQuickTemplates2/private/qquickpopup_p.h>
+// #include <QtQuickTemplates2/private/qquickpopupitem_p.h>
+#include <QtQuickTemplates2/private/qquickpane_p.h>
+#include <QtQuickTemplates2/private/qquickswipe_p.h>
+#include <QtQuickTemplates2/private/qquicksplitview_p.h>
+#include <QtQuickTemplates2/private/qquickscrollview_p.h>
+#include <QtQuickTemplates2/private/qquickscrollbar_p.h>
 #include <QtQuickTemplates2/private/qquickaction_p.h>
 #include <QtQuickTemplates2/private/qquicklabel_p.h>
-#include <QtQuickTemplates2/private/qquickmenubar_p.h>
+#include <QtQuickTemplates2/private/qquicktextarea_p.h>
+// #include <QtQuickTemplates2/private/qquicktextedit_p.h>
+#include <QtQuickTemplates2/private/qquickcombobox_p.h>
+#include <QtQuickTemplates2/private/qquickspinbox_p.h>
+#include <QtQuickTemplates2/private/qquickcheckbox_p.h>
+#include <QtQuickTemplates2/private/qquickslider_p.h>
 #include <QtQuickTemplates2/private/qquicktoolbutton_p.h>
+#include <QtQuickTemplates2/private/qquicktooltip_p.h>
 
 #include "qtuninline.h"
 
@@ -30,31 +45,57 @@ char* cxxabi__cxa_demangle(char*a0, char*a1, size_t *length, int *status) {
     return abi::__cxa_demangle(a0, a1, length, status);
 }
 
+#define DBGLOG qDebug()<<__FUNCTION__<<__LINE__
+
 static QString dummyqs("dummy&ref");
 void* uninlineholder() {
 #define nilobj(x) ((x*)0)
 
     if (nilobj(QObject)->metaObject()!=nullptr) { }
+    nilobj(QObject)->parent();
     if (nilobj(QMetaObject)->className()!=nullptr) {}
     if (nilobj(QVariant)->isValid()) {}
     nilobj(QJSEngine)->collectGarbage();
     nilobj(QJSEngine)->objectOwnership(0);
     nilobj(QJSEngine)->setObjectOwnership(0, QJSEngine::CppOwnership);
-    
+
+    (new QQuickMenuBar());
     nilobj(QQuickMenuBar)->addMenu(0);
     nilobj(QQuickMenuBar)->setHeight(0);
     nilobj(QQuickMenuBar)->setWidth(0);
 
+    (new QQuickMenu());
     nilobj(QQuickMenu)->addItem(0);
     nilobj(QQuickMenu)->addAction(0);
     nilobj(QQuickMenu)->setTitle(dummyqs); // 这个很奇怪
 
+    (new QQuickAction());
     nilobj(QQuickAction)->setText(0);
 
+    (new QQuickLabel());
     nilobj(QQuickLabel)->setText(0);
+    nilobj(QQuickLabel)->setWidth(0);
+    nilobj(QQuickLabel)->setHeight(0);
     nilobj(QQuickButton)->setText(0);
-    nilobj(QQuickToolButton)->setText(0);
 
+    (new QQuickButton());
+    (new QQuickToolButton());
+    nilobj(QQuickToolButton)->setText(0);
+    nilobj(QQuickPopup)->setZ(123);
+    nilobj(QQuickPopup)->z();
+    (new QQuickToolTip());
+    (delete nilobj(QQuickToolTip));
+    nilobj(QQuickToolTip)->setText(0);
+    nilobj(QQuickToolTip)->text();
+    nilobj(QQuickToolTip)->setDelay(0);
+    nilobj(QQuickToolTip)->setTimeout(0);
+    nilobj(QQuickToolTip)->setVisible(true);
+    nilobj(QQuickItem)->setVisible(true);
+
+    (new QQuickSplitView());
+    (new QQuickTextArea());
+    // (new QQuickImage());
+    // (new QQuickAnimatedImage());
 
 
     return nullptr;
@@ -280,4 +321,3 @@ QQuickItem* QQuickStackView_replaceCurrentItem(QQuickStackView* me, QQuickItem* 
 void* cgoir_dlsym0(const char* name) {
     return dlsym(RTLD_DEFAULT, name);
 }
-

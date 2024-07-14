@@ -190,6 +190,13 @@ func (me QObject) Dtor() {
 	cgopp.Litfficallg(sym, me.Cthis)
 }
 
+func (me QObject) Parent() QObject {
+	name := "_ZNK7QObject6parentEv"
+	sym := dlsym(name)
+	rv := cgopp.Litfficallg(sym, me.Cthis)
+	return QObjectof(rv)
+}
+
 // why slow, 1ms?
 func (me QObject) SetProperty(name string, valuex any) bool {
 
@@ -203,6 +210,7 @@ func (me QObject) SetProperty(name string, valuex any) bool {
 	// name4c := cgopp.CString(name)
 	// defer cgopp.Cfree(name4c)
 	rv := cgopp.Litfficallg(sym, me.Cthis, name4c, value.Cthis)
+	// rv := cgopp.FfiCall[int](sym, me.Cthis, name4c, value.Cthis)
 	gopp.GOUSED(rv)
 	return true
 }
@@ -349,6 +357,8 @@ func QVarintNew2(vx any) QVariant {
 	case voidptr:
 		vp = QVarintNew(value)
 	case bool:
+		vp = QVarintNew(value)
+	case float64:
 		vp = QVarintNew(value)
 	default:
 		log.Println("unimpl", reflect.TypeOf(vx), value)
@@ -728,4 +738,89 @@ func QJSEOwnership(obj QObject) int {
 	sym := dlsym(symname)
 	rv := cgopp.Litfficallg(sym, obj.Cthis)
 	return int(usize(rv))
+}
+
+// ///
+// 为什么 C++ 创建的显示不出来，isVisible()==false
+type QQuickToolTipst struct {
+	QObject
+}
+type QQuickToolTip = *QQuickToolTipst
+
+func QQuickToolTipof(ptr voidptr) QQuickToolTip {
+	me := &QQuickToolTipst{QObjectof(ptr)}
+	return me
+}
+
+func QQuickToolTipNew(p voidptr) QQuickToolTip {
+	// ctor no return
+	name := "_ZN13QQuickToolTipC1EP10QQuickItem"
+	sym := dlsym(name)
+
+	obj := cgopp.Mallocgc(256)
+	// obj := cgopp.Malloc(256)
+	rv := cgopp.Litfficallg(sym, obj, voidptr(usize(p)))
+	rv = obj
+	// log.Println(obj, rv)
+	return QQuickToolTipof(rv)
+}
+
+func (me QQuickToolTip) SetText(text string) {
+	// name := "_ZN13QQuickToolTip7setTextERK7QString"
+	// sym := dlsym(name)
+	// // text4c := cgopp.CStringaf(text)
+	// text4qt := QStringNew(text)
+	// cgopp.Litfficallg(sym, me.Cthis, text4qt.Cthis) // crash
+	me.SetProperty("text", text)
+}
+
+func (me QQuickToolTip) Text() string {
+	vx := me.Property("text")
+
+	return vx.Tostr()
+}
+
+func (me QQuickToolTip) SetTimeout(timeo int) {
+	name := "_ZN13QQuickToolTip10setTimeoutEi"
+	sym := dlsym(name)
+	// cgopp.Litfficallg(sym, me.Cthis, timeo)
+	cgopp.FfiCall[int](sym, me.Cthis, timeo)
+	log.Println(me.Property("timeout").Toint())
+}
+
+func (me QQuickToolTip) SetDelay(delay int) {
+	name := "_ZN13QQuickToolTip8setDelayEi"
+	sym := dlsym(name)
+	cgopp.Litfficallg(sym, me.Cthis, delay)
+}
+
+func (me QQuickToolTip) SetVisible(visible bool) {
+	name := "_ZN13QQuickToolTip10setVisibleEb"
+	sym := dlsym(name)
+	// cgopp.Litfficallg(sym, me.Cthis, visible)
+	cgopp.FfiCall[int](sym, me.Cthis, true)
+	// me.SetProperty("visible", 1)
+	// log.Println(me.Property("visible"))
+}
+
+func (me QQuickToolTip) Visible() bool {
+	name := "_ZNK11QQuickPopup9isVisibleEv"
+	sym := dlsym(name)
+	rv := cgopp.FfiCall[bool](sym, me.Cthis)
+	return rv
+	// vx := me.Property("visible")
+	// log.Println(vx)
+	// return vx.Tobool()
+}
+
+func (me QQuickToolTip) SetZ(z float64) {
+	name := "_ZN11QQuickPopup4setZEd"
+	sym := dlsym(name)
+	cgopp.FfiCall[int](sym, me.Cthis, z)
+}
+func (me QQuickToolTip) Z() (z float64) {
+	name := "_ZNK11QQuickPopup1zEv"
+	sym := dlsym(name)
+	z = cgopp.FfiCall[float64](sym, me.Cthis)
+	return
 }
