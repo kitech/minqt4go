@@ -88,7 +88,7 @@ func RunonUithread(f func()) {
 	cgopp.Litfficallg(sym, sym2, seq)
 }
 func RunonUithreadx(fx any, args ...any) {
-
+	RunonUithread(func() { gopp.CallFuncx(fx, args...) })
 }
 
 // 应该放在minqt包里面
@@ -236,7 +236,10 @@ func (me QObject) FindChild(objname string) QObject {
 	// on4c := cgopp.CString(objname)
 	// defer cgopp.Cfree(on4c)
 	rv := cgopp.Litfficallg(sym, me.Cthis, on4c)
-	gopp.NilPrint(rv, "fc404", objname, me.Dbgstr())
+	// gopp.NilPrint(rv, "fc404", objname, me.Dbgstr())
+	if rv == nil {
+		return nil
+	}
 
 	return QObjectof(rv)
 }

@@ -14,6 +14,8 @@
 // #include <QtQuickTemplates2/private/qquicksplitter_p.h>
 #include <QtQml/private/qqmlbuiltinfunctions_p.h>
 #include <QtQuickTemplates2/private/qquickapplicationwindow_p.h>
+#include <QtQuick/private/qquicklistview_p.h>
+#include <QtQuick/private/qquickflickable_p.h>
 #include <QtQuick/private/qquickloader_p.h>
 #include <QtQuickTemplates2/private/qquickmenubar_p.h>
 #include <QtQuickTemplates2/private/qquickmenu_p.h>
@@ -310,8 +312,12 @@ QQuickItem* QQuickStackView_get(QQuickStackView*me, int idx) {
 }
 #if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
 QQuickItem* QQuickStackView_replaceCurrentItem(QQuickStackView* me, QQuickItem* item) {
+    auto olditem = me->currentItem();
     auto rv = me->replaceCurrentItem(item);
-    return rv;
+    return olditem;
+    // DBGLOG<<(rv==olditem)<<(void*)olditem<<(void*)rv;
+    // DBGLOG<<(rv==item)<<(void*)item<<(void*)rv;
+    // return rv;
 }
 #endif
 

@@ -57,12 +57,13 @@ func (me *ListModelBase) Add(d Datar) bool {
 	} else {
 		inspos = me.datas.BinFind(d, modeldatacmper)
 	}
-	// log.Println(inspos, d.OrderKey(), d.DedupKey())
+	// log.Println(inspos, d.OrderKey(), d.DedupKey(), me.datas.Len())
 	// me.BeginChangeRows(me.datas.Count(), me.datas.Count(), false)
 	me.BeginChangeRows(inspos, inspos, false)
 	// ok := me.datas.Put(d.DedupKey(), d)
 	ok := me.datas.InsertAt(inspos, d.DedupKey(), d)
 	me.EndChangeRows(false)
+	// log.Println(inspos, d.OrderKey(), d.DedupKey(), me.datas.Len())
 	if ok {
 	}
 
@@ -73,13 +74,14 @@ func (me *ListModelBase) Update(d Datar) bool {
 
 	idx := me.datas.Indexof(d.DedupKey())
 	gopp.TruePrint(idx < 0, "notfound", d.DedupKey())
-	if idx > 0 {
+	// log.Println(idx, me.datas.Count())
+	if idx >= 0 {
 		me.BeginChangeRows(idx, idx, true)
 		me.datas.Del(d.DedupKey())
 		me.EndChangeRows(true)
+		// log.Println(idx, me.datas.Count())
 
 		ok := me.Add(d)
-
 		return ok
 	}
 	return false
