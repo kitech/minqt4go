@@ -720,7 +720,7 @@ func (me QMetaObject) InvokeQmlmf(obj QObject, slotname string, args ...any) {
 	gopp.GOUSED(rv)
 }
 func QMOInvokeQmlmf(obj QObject, slotname string, args ...any) {
-	QMetaObjectof0().InvokeQmlmf(obj, slotname, args...)
+	((QMetaObject)(nil)).InvokeQmlmf(obj, slotname, args...)
 }
 
 // todo how simple get root object

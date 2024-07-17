@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/kitech/gopp"
 	"github.com/kitech/gopp/cgopp"
@@ -22,14 +23,26 @@ extern void* _Z20cxxabi__cxa_demanglePcS_PmPi(void*, void*, void*, void*);
 import "C"
 
 func demangle(name string) (string, bool) {
-	//
 	name4c := cgopp.CStringgc(name)
-	res4c := cgopp.Mallocgc(1234)
-	var reslen usize = 1234
+	// cgopp.SetPin(name4c, true)
+	// defer cgopp.SetPin(name4c, false)
+
+	//
+	var reslen usize = 0
 	var resok int
+	C._Z20cxxabi__cxa_demanglePcS_PmPi(name4c, nil, (voidptr)(&reslen), (voidptr)(&resok))
+	if reslen > gopp.MB {
+		log.Panic(reslen)
+	}
+	reslen += 123
+
+	res4c := cgopp.Mallocgc(int(reslen))
+	// cgopp.SetPin(res4c, true)
+	// defer cgopp.SetPin(res4c, false)
+
 	rv := C._Z20cxxabi__cxa_demanglePcS_PmPi(name4c, res4c, (voidptr)(&reslen), (voidptr)(&resok))
 	// log.Println(name, resok, reslen, rv, cgopp.GoString(rv), res4c)
-	gopp.TruePrint(rv != res4c)
+	gopp.TruePrint(rv != res4c, "wow", rv, res4c)
 
 	return cgopp.GoString(res4c), resok == 0
 }
@@ -54,9 +67,19 @@ func main() {
 	log.Println(libs, len(libs))
 	signtx := gopp.Mapdo(libs, func(idx int, vx any) (rets []any) {
 		log.Println(idx, vx, gopp.Bytes2Humz(gopp.FileSize(vx.(string))))
-		lines, err := gopp.RunCmd(".", "nm", vx.(string))
-		gopp.ErrPrint(err, vx)
-		log.Println(idx, vx, len(lines))
+		tmpfile := "symfiles/" + filepath.Base(vx.(string)) + ".sym"
+		var lines []string
+		if !gopp.FileExist2(tmpfile) {
+			lines, err := gopp.RunCmd(".", "nm", vx.(string))
+			gopp.ErrPrint(err, vx)
+			log.Println(idx, vx, len(lines))
+			// save cache
+			gopp.SafeWriteFile(tmpfile, []byte(strings.Join(lines, "\n")), 0644)
+		} else {
+			bcc, err := os.ReadFile(tmpfile)
+			gopp.ErrPrint(err, tmpfile)
+			lines = strings.Split(string(bcc), "\n")
+		}
 
 		for _, line := range lines {
 			if strings.Contains(line, stub) && !strings.Contains(line, "Private") {
@@ -66,6 +89,7 @@ func main() {
 				log.Println(name, ok, signt)
 				rets = append(rets, name, signt)
 			}
+			addsymrawline(filepath.Base(vx.(string)), line)
 		}
 		return
 	})
@@ -96,6 +120,15 @@ func main() {
 
 	codesnip := cp.ExportAll()
 	log.Println(codesnip)
+
+	log.Println(len(Classes), "mthcnt", len(dedups), "deduped", dedupedcnt, gopp.DeepSizeof(Classes, 0))
+
+	time.Sleep(gopp.DurandSec(23, 3))
+	Classes = nil
+	dedups = nil
+	log.Println("clean vars")
+
+	gopp.Forever()
 }
 
 func SplitMethod(s string) (string, string) {
