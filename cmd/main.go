@@ -10,42 +10,12 @@ import (
 	"time"
 
 	"github.com/kitech/gopp"
-	"github.com/kitech/gopp/cgopp"
 )
 
 /*
-// #include <cxxabi.h>
 
-#cgo LDFLAGS: -lc++
-
-extern void* _Z20cxxabi__cxa_demanglePcS_PmPi(void*, void*, void*, void*);
-*/
+ */
 import "C"
-
-func demangle(name string) (string, bool) {
-	name4c := cgopp.CStringgc(name)
-	// cgopp.SetPin(name4c, true)
-	// defer cgopp.SetPin(name4c, false)
-
-	//
-	var reslen usize = 0
-	var resok int
-	C._Z20cxxabi__cxa_demanglePcS_PmPi(name4c, nil, (voidptr)(&reslen), (voidptr)(&resok))
-	if reslen > gopp.MB {
-		log.Panic(reslen)
-	}
-	reslen += 123
-
-	res4c := cgopp.Mallocgc(int(reslen))
-	// cgopp.SetPin(res4c, true)
-	// defer cgopp.SetPin(res4c, false)
-
-	rv := C._Z20cxxabi__cxa_demanglePcS_PmPi(name4c, res4c, (voidptr)(&reslen), (voidptr)(&resok))
-	// log.Println(name, resok, reslen, rv, cgopp.GoString(rv), res4c)
-	gopp.TruePrint(rv != res4c && rv != nil, "wow", rv, res4c)
-
-	return cgopp.GoString(res4c), resok == 0
-}
 
 // 按照 minqt 的格式规范，生成对应函数/类(?)的封装
 // 包括能够取到的符号表
@@ -121,10 +91,11 @@ func main() {
 	codesnip := cp.ExportAll()
 	log.Println(codesnip)
 
-	log.Println(len(Classes), "mthcnt", len(dedups), "deduped", dedupedcnt, gopp.DeepSizeof(Classes, 0))
+	log.Println(len(Classes), "mthcnt", len(dedups), "deduped", dedupedcnt, gopp.Bytes2Hum(gopp.DeepSizeof(Classes, 0)))
 
 	testcall()
 
+	log.Println("top -pid", os.Getpid())
 	time.Sleep(gopp.DurandSec(23, 3))
 	Classes = nil
 	dedups = nil
