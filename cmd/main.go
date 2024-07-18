@@ -42,7 +42,7 @@ func demangle(name string) (string, bool) {
 
 	rv := C._Z20cxxabi__cxa_demanglePcS_PmPi(name4c, res4c, (voidptr)(&reslen), (voidptr)(&resok))
 	// log.Println(name, resok, reslen, rv, cgopp.GoString(rv), res4c)
-	gopp.TruePrint(rv != res4c, "wow", rv, res4c)
+	gopp.TruePrint(rv != res4c && rv != nil, "wow", rv, res4c)
 
 	return cgopp.GoString(res4c), resok == 0
 }
@@ -123,6 +123,8 @@ func main() {
 
 	log.Println(len(Classes), "mthcnt", len(dedups), "deduped", dedupedcnt, gopp.DeepSizeof(Classes, 0))
 
+	testcall()
+
 	time.Sleep(gopp.DurandSec(23, 3))
 	Classes = nil
 	dedups = nil
@@ -148,4 +150,16 @@ func SplitMethod(s string) (string, string) {
 		return "", flds[0]
 	}
 	return flds[0], flds[1]
+}
+
+func SplitArgs(s string) (rets []string) {
+	pos1 := strings.Index(s, "(")
+	pos2 := strings.LastIndex(s, ")")
+
+	mid := s[pos1+1 : pos2]
+	log.Println(mid)
+
+	rets = strings.Split(mid, ", ")
+
+	return
 }

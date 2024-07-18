@@ -10,8 +10,9 @@ import (
 var Classes = map[string][]ccMethod{} // class name => struct type
 type ccMethod struct {
 	reflect.Method
-	CCSym string
-	CCCrc uint64
+	Static bool
+	CCSym  string
+	CCCrc  uint64
 }
 
 var dedups = map[uint64]int{} // sym crc =>
@@ -27,7 +28,12 @@ func addsymrawline(qtmodename string, line string) {
 func addsym(name string) {
 	// log.Println("demangle...", len(name), name)
 	sgnt, ok := demangle(name)
-	gopp.FalsePrint(ok, "demangle failed", name)
+	if strings.HasPrefix(name, "GCC_except") {
+	} else if strings.HasPrefix(name, "_OBJC_") {
+	} else if strings.Contains(name, "QtPrivate") {
+	} else {
+		// gopp.FalsePrint(ok, "demangle failed", name)
+	}
 	// log.Println(ok, len(name), "=>", len(sgnt), sgnt, ok)
 	if !ok {
 		return
@@ -74,7 +80,7 @@ func addsym(name string) {
 	}
 	defer func() { dedups[mtho.CCCrc] = 1 }()
 
-	mtho.Name = mthname
+	mtho.Name = strings.Title(mthname)
 	mtho.Index = len(mths)
 	mtho.Type = nil
 	mtho.Func = reflect.Value{}
