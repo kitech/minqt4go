@@ -9,12 +9,20 @@ import (
 	"github.com/kitech/gopp"
 )
 
-func callany(obj voidptr, args ...any) {
-	pc, _, _, _ := runtime.Caller(1)
+// only call by callany
+func getclzmthbycaller() (clz string, mth string) {
+	pc, _, _, _ := runtime.Caller(2)
 	fno := runtime.FuncForPC(pc)
 	fnname := fno.Name()
 	log.Println(fno, fnname, gopp.Retn(fno.FileLine(pc)))
 
+	// main.NewQxx
+	if pos := strings.LastIndex(fnname, ".NewQ"); pos > 0 {
+		clz = fnname[pos+4:]
+		mth = clz
+		return
+	}
+	// main.(*QObject).Dummy
 	funcname := "main.(*QObject).Dummy"
 	funcname = fnname
 	pos1 := strings.Index(funcname, "(")
@@ -22,14 +30,28 @@ func callany(obj voidptr, args ...any) {
 	clzname := funcname[pos1+2 : pos2]
 	mthname := funcname[pos2+2:]
 
+	log.Println(clzname, mthname)
+
+	clz = clzname
+	mth = mthname
+	return
+}
+
+func callany(obj voidptr, args ...any) {
+	clzname, mthname := getclzmthbycaller()
 	log.Println(clzname, mthname, obj, args)
+	isctor := clzname == mthname
 
 	mths, ok := Classes[clzname]
 	gopp.FalsePrint(ok, "not found???", clzname)
 
 	//
+	var namercmths []ccMethod // 备份
 	var rcmths = mths
+
 	rcmths = resolvebyname(mthname, rcmths)
+	namercmths = rcmths
+
 	// 根据参数个数
 	rcmths = resolvebyargc(len(args), rcmths)
 
@@ -37,10 +59,15 @@ func callany(obj voidptr, args ...any) {
 	argtys := reflecttypes(args...)
 	rcmths = resolvebyargty(argtys, rcmths)
 
-	log.Println("final rcmths:", len(rcmths))
+	if isctor {
+		rcmths = resolvebyctorno(rcmths)
+	}
+
+	log.Println("final rcmths:", len(rcmths), rcmths)
 	switch len(rcmths) {
 	case 0:
 		// so fuck
+		gopp.Warn("No match, rcmths", namercmths)
 	case 1:
 		// good
 	default:
@@ -48,9 +75,42 @@ func callany(obj voidptr, args ...any) {
 	}
 }
 
-func qttypemathch(tystr string, tyo reflect.Type) bool {
-	log.Println("tymat", tystr, "?<=", tyo.String())
-	return false
+func resolvebyctorno(mths []ccMethod) (rets []ccMethod) {
+	// bye C1E, C2E
+	c2idx := -1
+	c1idx := -1
+	for idx, mtho := range mths {
+		if strings.Contains(mtho.CCSym, mtho.Name+"C1E") {
+			c1idx = idx
+		} else if strings.Contains(mtho.CCSym, mtho.Name+"C2E") {
+			c2idx = idx
+		}
+	}
+	if c2idx >= 0 {
+		rets = append(rets, mths[c2idx])
+	} else if c2idx >= 0 {
+		rets = append(rets, mths[c1idx])
+	} else {
+	}
+	return
+}
+
+// todo todo todo
+func qttypemathch(idx int, tystr string, tyo reflect.Type) bool {
+	// log.Println("tymat", idx, tystr, "?<=", tyo.String())
+	goty := tyo.String()
+
+	tymat := false
+	if goty == tystr {
+		tymat = true
+	} else if goty+"&" == tystr {
+		tymat = true
+	} else if goty == "[]string" && tystr == "char**" {
+		tymat = true
+	}
+	log.Println("tymat", idx, tystr, "?<=", tyo.String(), tymat)
+
+	return tymat
 }
 
 func resolvebyargty(tys []reflect.Type, mths []ccMethod) (rets []ccMethod) {
@@ -60,11 +120,11 @@ func resolvebyargty(tys []reflect.Type, mths []ccMethod) (rets []ccMethod) {
 		sgnt, _ := demangle(mtho.CCSym)
 		// log.Println(sgnt, mtho.CCSym)
 		vec := SplitArgs(sgnt)
-		// log.Println(vec)
+		log.Println(len(vec), vec, sgnt)
 
 		allmat := true
 		for j := 0; j < len(vec); j++ {
-			mat := qttypemathch(vec[j], tys[j])
+			mat := qttypemathch(j, vec[j], tys[j])
 			if !mat {
 				allmat = false
 			}
@@ -80,7 +140,7 @@ func resolvebyargty(tys []reflect.Type, mths []ccMethod) (rets []ccMethod) {
 func resolvebyname(mthname string, mths []ccMethod) (rets []ccMethod) {
 
 	for _, mtho := range mths {
-		log.Println(mtho.Name)
+		// log.Println(mtho.Name)
 		if mtho.Name == mthname {
 			log.Println(gopp.MyFuncName(), "rc", mthname, mtho.CCCrc, mtho.CCSym)
 			rets = append(rets, mtho)
@@ -96,7 +156,7 @@ func resolvebyargc(argc int, mths []ccMethod) (rets []ccMethod) {
 		// log.Println(sgnt, mtho.CCSym)
 		vec := SplitArgs(sgnt)
 		// log.Println(vec)
-		if true || len(vec) == argc {
+		if len(vec) == argc {
 			log.Println(gopp.MyFuncName(), "rc", mtho.CCCrc, mtho.CCSym)
 			rets = append(rets, mtho)
 		}
@@ -112,17 +172,4 @@ func reflecttypes(args ...any) (rets []reflect.Type) {
 	}
 
 	return
-}
-
-// ///
-type QObject struct {
-	Cthis voidptr
-}
-
-func (me *QObject) Connect(args ...any) {
-	callany(me.Cthis, args...)
-}
-func testcall() {
-	me := &QObject{}
-	me.Connect(voidptr(usize(0)), 123, "aiewjff", 456.78, 999)
 }

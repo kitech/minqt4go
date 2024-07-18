@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"reflect"
 	"strings"
 
@@ -88,4 +89,38 @@ func addsym(name string) {
 
 	mths = append(mths, mtho)
 	Classes[clzname] = mths
+}
+
+func SplitMethod(s string) (string, string) {
+	idx := strings.LastIndexAny(s, " )")
+	if idx != -1 {
+		s = s[:idx]
+	}
+
+	flds := strings.Split(s, "::")
+	for i, fld := range flds {
+		idx := strings.Index(fld, "(")
+		if idx != -1 {
+			flds[i] = fld[:idx]
+		}
+	}
+	if len(flds) < 2 {
+		return "", flds[0]
+	}
+	return flds[0], flds[1]
+}
+
+func SplitArgs(s string) (rets []string) {
+	pos1 := strings.Index(s, "(")
+	pos2 := strings.LastIndex(s, ")")
+
+	mid := s[pos1+1 : pos2]
+	log.Println(mid)
+	if mid == "" {
+		return
+	}
+
+	rets = strings.Split(mid, ", ")
+
+	return
 }

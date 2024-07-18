@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -23,12 +25,15 @@ import "C"
 // TODO 获取不到 static
 // usage:
 func main() {
+	runtime.LockOSThread()
 	flag.Parse()
 
 	stub := flag.Arg(0)
 	if gopp.Empty(stub) {
 		return
 	}
+
+	var nowt = time.Now()
 
 	libpfx := gopp.Mustify(os.UserHomeDir())[0].Str() + "/.nix-profile/lib"
 	globtmpl := fmt.Sprintf("%s/Qt*.framework/Qt*", libpfx)
@@ -63,7 +68,7 @@ func main() {
 		}
 		return
 	})
-	log.Println(gopp.Lenof(signtx))
+	log.Println(gopp.Lenof(signtx), time.Since(nowt)) // about 1.1s
 	signt := gopp.IV2Strings(signtx.([]any))
 	cp := gopp.NewCodePager()
 	for i := 0; i < len(signt); i += 2 {
@@ -92,8 +97,28 @@ func main() {
 	log.Println(codesnip)
 
 	log.Println(len(Classes), "mthcnt", len(dedups), "deduped", dedupedcnt, gopp.Bytes2Hum(gopp.DeepSizeof(Classes, 0)))
+	{
+		bcc, err := json.Marshal(Classes)
+		gopp.ErrPrint(err)
+		gopp.SafeWriteFile("Classes.json", bcc, 0644)
+		bcc = nil
+
+		nowt := time.Now()
+		bcc, err = os.ReadFile("Classes.json")
+		gopp.ErrPrint(err)
+		Classes = nil
+		err = json.Unmarshal(bcc, &Classes)
+		gopp.ErrPrint(err)
+		log.Println("decode big json", time.Since(nowt)) // about 400ms
+		bcc = nil
+	}
 
 	testcall()
+
+	Libman.Open()
+
+	NewQGuiApplication(1, []string{"./heh.exe"}, 0)
+	(&QGuiApplication{}).Exec()
 
 	log.Println("top -pid", os.Getpid())
 	time.Sleep(gopp.DurandSec(23, 3))
@@ -102,35 +127,4 @@ func main() {
 	log.Println("clean vars")
 
 	gopp.Forever()
-}
-
-func SplitMethod(s string) (string, string) {
-	idx := strings.LastIndexAny(s, " )")
-	if idx != -1 {
-		s = s[:idx]
-	}
-
-	flds := strings.Split(s, "::")
-	for i, fld := range flds {
-		idx := strings.Index(fld, "(")
-		if idx != -1 {
-			flds[i] = fld[:idx]
-		}
-	}
-	if len(flds) < 2 {
-		return "", flds[0]
-	}
-	return flds[0], flds[1]
-}
-
-func SplitArgs(s string) (rets []string) {
-	pos1 := strings.Index(s, "(")
-	pos2 := strings.LastIndex(s, ")")
-
-	mid := s[pos1+1 : pos2]
-	log.Println(mid)
-
-	rets = strings.Split(mid, ", ")
-
-	return
 }
