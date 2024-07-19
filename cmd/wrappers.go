@@ -17,13 +17,27 @@ type QGuiApplication struct {
 	Cthis voidptr
 }
 
-func NewQGuiApplication(argc int, argv []string, flags int) {
-	callany(nil, argc, argv, flags)
+func NewQGuiApplication(argc int, argv []string, flags int) *QGuiApplication {
+	cthis := callany(nil, argc, argv, flags)
+	return &QGuiApplication{cthis}
 }
 
 func (me *QGuiApplication) Exec() int {
 	callany(me.Cthis)
 	return 0
+}
+
+type QQmlApplicationEngine struct {
+	Cthis voidptr
+}
+
+func NewQQmlApplicationEngine(obj *QObject) *QQmlApplicationEngine {
+	cthis := callany(nil, obj)
+	return &QQmlApplicationEngine{cthis}
+}
+
+func (me *QQmlApplicationEngine) Load(qmlfile string) {
+	callany(me.Cthis, qmlfile)
 }
 
 /*

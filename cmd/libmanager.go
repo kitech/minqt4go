@@ -30,12 +30,32 @@ func LibManagerNew() *LibManager {
 	return me
 }
 
+// Enter works
+func PauseAk() {
+	var c [1]byte
+	n, err := os.Stdin.Read(c[:])
+	gopp.ErrPrint(err, n)
+}
+
 func (me *LibManager) Open() {
 	nowt := time.Now()
 	globtmpl := fmt.Sprintf("%s/Qt*.framework/Qt*", libpfx)
 	libs, err := filepath.Glob(globtmpl)
 	gopp.ErrPrint(err, libs)
 	// log.Println(libs, len(libs))
+
+	{
+		// hotfix for QString::QString(char const*)
+		file := "~/Downloads/libQt5Inline.dylib" // not work qt6
+		file = gopp.Mustify1(os.UserHomeDir()) + "/aprog/fedimqt/libhelloworld.dylib"
+		dlh, err := purego.Dlopen(file, purego.RTLD_LAZY)
+		gopp.ErrPrint(err, file)
+		// log.Println(dlh)
+		// PauseAk()
+		if dlh != 0 {
+			me.libs[filepath.Base(file)] = dlh
+		}
+	}
 
 	gopp.Mapdo(libs, func(idx int, vx any) any {
 		dlh, err := purego.Dlopen(vx.(string), purego.RTLD_LAZY)
@@ -55,7 +75,7 @@ func (me *LibManager) Dlsym(name string) voidptr {
 		symptr, err := purego.Dlsym(dlh, name)
 		gopp.ErrPrint(err, name, mod)
 		if symptr != 0 {
-			log.Println("found symbol in", mod)
+			log.Println("found symbol in", mod, name)
 			return voidptr(symptr)
 		}
 	}

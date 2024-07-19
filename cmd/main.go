@@ -117,8 +117,10 @@ func main() {
 
 	Libman.Open()
 
-	NewQGuiApplication(1, []string{"./heh.exe"}, 0)
-	(&QGuiApplication{}).Exec()
+	app := NewQGuiApplication(1, []string{"./heh.exe"}, 0)
+	ape := NewQQmlApplicationEngine(nil)
+	ape.Load("hh.qml")
+	app.Exec()
 
 	log.Println("top -pid", os.Getpid())
 	time.Sleep(gopp.DurandSec(23, 3))

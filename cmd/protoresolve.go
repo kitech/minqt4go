@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/kitech/gopp"
+	"github.com/kitech/gopp/cgopp"
 )
 
 // only call by callany
@@ -37,9 +38,10 @@ func getclzmthbycaller() (clz string, mth string) {
 	return
 }
 
-func callany(obj voidptr, args ...any) {
+// like jit, name jitqt
+func callany(cobj voidptr, args ...any) voidptr {
 	clzname, mthname := getclzmthbycaller()
-	log.Println(clzname, mthname, obj, args)
+	log.Println(clzname, mthname, cobj, args)
 	isctor := clzname == mthname
 
 	mths, ok := Classes[clzname]
@@ -64,19 +66,39 @@ func callany(obj voidptr, args ...any) {
 	}
 
 	log.Println("final rcmths:", len(rcmths), rcmths)
+	var ccret voidptr
 	switch len(rcmths) {
 	case 0:
-		// so fuck
-		gopp.Warn("No match, rcmths", namercmths)
+		// sowtfuck
+		gopp.Warn("No match, rcmths", len(namercmths), namercmths, len(namercmths))
 	case 1:
 		// good
+		mtho := rcmths[0]
+		convedargs := argsconvert(mtho, argtys, args...)
+		log.Println("oriargs", len(args), args)
+		log.Println("convedargs", len(convedargs), convedargs)
+		fnsym := Libman.Dlsym(mtho.CCSym)
+		if isctor {
+			cthis := cgopp.Mallocgc(123)
+			ccargs := append([]any{cthis}, convedargs...)
+			// log.Println("fficall info", mthname, fnsym, len(args), len(ccargs), ccargs)
+			// cpp ctor 函数是没有返回值的
+			cgopp.FfiCall[int](fnsym, ccargs...)
+			ccret = cthis
+		} else {
+			// todo
+			ccargs := append([]any{cobj}, convedargs...)
+			// log.Println("fficall info", clzname, mthname, fnsym, len(args), len(ccargs), ccargs)
+			ccret = cgopp.FfiCall[voidptr](fnsym, ccargs...)
+		}
 	default:
-
+		// sowtfuck
 	}
+	return ccret
 }
 
 func resolvebyctorno(mths []ccMethod) (rets []ccMethod) {
-	// bye C1E, C2E
+	// bye C1E, C2E, C3E?
 	c2idx := -1
 	c1idx := -1
 	for idx, mtho := range mths {
@@ -96,21 +118,80 @@ func resolvebyctorno(mths []ccMethod) (rets []ccMethod) {
 }
 
 // todo todo todo
-func qttypemathch(idx int, tystr string, tyo reflect.Type) bool {
+func qttypemathch(idx int, tystr string, tyo reflect.Type, conv bool, argx any) (any, bool) {
 	// log.Println("tymat", idx, tystr, "?<=", tyo.String())
-	goty := tyo.String()
+	// goty := tyo.String()
 
+	var rvx = argx
 	tymat := false
-	if goty == tystr {
-		tymat = true
-	} else if goty+"&" == tystr {
-		tymat = true
-	} else if goty == "[]string" && tystr == "char**" {
-		tymat = true
-	}
-	log.Println("tymat", idx, tystr, "?<=", tyo.String(), tymat)
 
-	return tymat
+	mcdata := &TMCData{}
+	mcdata.idx = idx
+	mcdata.ctys = tystr
+	mcdata.gotyo = tyo
+	mcdata.goargx = argx
+
+	for _, mater := range typemcers {
+		tymat = mater.Match(mcdata, conv)
+		if tymat {
+			if conv {
+				rvx = mcdata.ffiargx
+			}
+			log.Println("matched", reflect.TypeOf(mater), conv)
+			break
+		}
+	}
+
+	// if goty == tystr {
+	// 	tymat = true
+	// } else if goty+"&" == tystr {
+	// 	tymat = true
+	// 	if conv {
+	// 		// 只对primitive type可以
+	// 		refval := reflect.New(tyo)
+	// 		refval.Elem().Set(reflect.ValueOf(argx))
+	// 		rvx = refval.Interface()
+	// 	}
+	// } else if goty == "[]string" && tystr == "char**" {
+	// 	tymat = true
+	// 	if conv {
+	// 		// todo how freeit
+	// 		ptr := cgopp.CStrArrFromStrs(argx.([]string))
+	// 		rvx = ptr
+	// 	}
+
+	// 	// QObject* ?<= *main.QObject
+	// } else if isqtptrtymat(tystr, tyo) {
+	// 	tymat = true
+	// 	if conv {
+	// 		tvx := reflect.ValueOf(argx)
+	// 		if tvx.IsNil() {
+
+	// 		} else {
+	// 			// .Elem().FieldByName("Cthis")
+	// 		}
+	// 		log.Println(tvx)
+	// 	}
+	// }
+	gopp.FalsePrint(tymat, "tymat", idx, tystr, "?<=", tyo.String(), tymat)
+
+	return rvx, tymat
+}
+
+func argsconvert(mtho ccMethod, tys []reflect.Type, args ...any) (rets []any) {
+	sgnt, _ := demangle(mtho.CCSym)
+	// log.Println(sgnt, mtho.CCSym)
+	vec := SplitArgs(sgnt)
+	log.Println(len(vec), vec, sgnt)
+
+	for j := 0; j < len(vec); j++ {
+		argx, mat := qttypemathch(j, vec[j], tys[j], true, args[j])
+		if !mat {
+			// wtf???
+		}
+		rets = append(rets, argx)
+	}
+	return
 }
 
 func resolvebyargty(tys []reflect.Type, mths []ccMethod) (rets []ccMethod) {
@@ -124,7 +205,7 @@ func resolvebyargty(tys []reflect.Type, mths []ccMethod) (rets []ccMethod) {
 
 		allmat := true
 		for j := 0; j < len(vec); j++ {
-			mat := qttypemathch(j, vec[j], tys[j])
+			_, mat := qttypemathch(j, vec[j], tys[j], false, nil)
 			if !mat {
 				allmat = false
 			}
