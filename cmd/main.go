@@ -66,7 +66,7 @@ func main() {
 	codesnip := cp.ExportAll()
 	log.Println("codesnip", codesnip)
 
-	log.Println(len(qtrt.Classes), "mthcnt", len(qtrt.Symdedups), "deduped", qtrt.Symdedupedcnt, gopp.Bytes2Hum(gopp.DeepSizeof(qtrt.Classes, 0)))
+	log.Println(len(qtrt.QtSymbols), "mthcnt", len(qtrt.Symdedups), "deduped", qtrt.Symdedupedcnt, gopp.Bytes2Hum(gopp.DeepSizeof(qtrt.QtSymbols, 0)))
 
 	testcall()
 
@@ -85,7 +85,7 @@ func main() {
 
 	log.Println("top -pid", os.Getpid())
 	time.Sleep(gopp.DurandSec(23, 3))
-	qtrt.Classes = nil
+	qtrt.QtSymbols = nil
 	qtrt.Symdedups = nil
 	log.Println("clean vars")
 
