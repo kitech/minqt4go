@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"log"
 	"os"
@@ -32,12 +31,15 @@ func main() {
 
 	stub := flag.Arg(0)
 	if gopp.Empty(stub) {
+		log.Println("input some keywords like engine")
 		return
 	}
 
 	var nowt = time.Now()
 	signt := qtrt.LoadAllQtSymbols(stub)
 	log.Println(gopp.Lenof(signt), time.Since(nowt)) // about 1.1s
+	// os.Exit(0)
+
 	cp := gopp.NewCodePager()
 	for i := 0; i < len(signt); i += 2 {
 		oname := signt[i]
@@ -62,34 +64,24 @@ func main() {
 	}
 
 	codesnip := cp.ExportAll()
-	log.Println(codesnip)
+	log.Println("codesnip", codesnip)
 
 	log.Println(len(qtrt.Classes), "mthcnt", len(qtrt.Symdedups), "deduped", qtrt.Symdedupedcnt, gopp.Bytes2Hum(gopp.DeepSizeof(qtrt.Classes, 0)))
-	{
-		bcc, err := json.Marshal(qtrt.Classes)
-		gopp.ErrPrint(err)
-		gopp.SafeWriteFile("Classes.json", bcc, 0644)
-		bcc = nil
-
-		nowt := time.Now()
-		bcc, err = os.ReadFile("Classes.json")
-		gopp.ErrPrint(err)
-		qtrt.Classes = nil
-		err = json.Unmarshal(bcc, &qtrt.Classes)
-		gopp.ErrPrint(err)
-		log.Println("decode big json", time.Since(nowt)) // about 400ms
-		bcc = nil
-	}
 
 	testcall()
 
-	// Libman.Open()
+	log.Println("top -pid", os.Getpid())
+	// gopp.PauseAk() // 到这儿，内存24M
 
 	app := NewQGuiApplication(1, []string{"./heh.exe"}, 0)
+	// gopp.PauseAk() // 到这儿，内存26M
 	ape := NewQQmlApplicationEngine(nil)
+	// gopp.PauseAk() // 到这儿，内存27M
 	ape.Load("hh.qml")
 	log.Println("top -pid", os.Getpid())
-	app.Exec()
+	// gopp.PauseAk() // 到这儿，内存28M
+	log.Println("app.Exec ...")
+	app.Exec() // 到这儿，内存32M
 
 	log.Println("top -pid", os.Getpid())
 	time.Sleep(gopp.DurandSec(23, 3))
