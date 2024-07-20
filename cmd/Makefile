@@ -2,7 +2,7 @@ all:
 	echo "subcm: <run|cxlib>"
 
 run:
-	LD_LIBRARY_PATH=../srcc GOGC=10 ./main keyword
+	LD_LIBRARY_PATH=../srcc QTGO_DEBUG_FFI_CALL=1 GOGC=10 ./main keyword
 
 cxlib:
 	make -C ../srcc

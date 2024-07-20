@@ -22,7 +22,7 @@ type LibManager struct {
 	opened bool
 }
 
-var Libman = LibManagerNew()
+var depLibman = LibManagerNew()
 
 func LibManagerNew() *LibManager {
 	me := &LibManager{}

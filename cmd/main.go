@@ -3,10 +3,8 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -15,7 +13,7 @@ import (
 
 	_ "github.com/kitech/minqt/qtinline" // import这个包，链接还是慢
 	_ "github.com/qtui/qtmeta"
-	_ "github.com/qtui/qtrt"
+	"github.com/qtui/qtrt"
 )
 
 /*
@@ -38,45 +36,8 @@ func main() {
 	}
 
 	var nowt = time.Now()
-
-	libpfx := gopp.Mustify(os.UserHomeDir())[0].Str() + "/.nix-profile/lib"
-	globtmpl := fmt.Sprintf("%s/Qt*.framework/Qt*", libpfx)
-	libs, err := filepath.Glob(globtmpl)
-	gopp.ErrPrint(err, libs)
-	libnames := gopp.Mapdo(libs, func(vx any) any {
-		return filepath.Base(vx.(string))
-	})
-	log.Println(gopp.FirstofGv(libs), libnames, len(libs))
-	signtx := gopp.Mapdo(libs, func(idx int, vx any) (rets []any) {
-		log.Println(idx, vx, gopp.Bytes2Humz(gopp.FileSize(vx.(string))))
-		tmpfile := "symfiles/" + filepath.Base(vx.(string)) + ".sym"
-		var lines []string
-		if !gopp.FileExist2(tmpfile) {
-			lines, err := gopp.RunCmd(".", "nm", vx.(string))
-			gopp.ErrPrint(err, vx)
-			log.Println(idx, vx, len(lines))
-			// save cache
-			gopp.SafeWriteFile(tmpfile, []byte(strings.Join(lines, "\n")), 0644)
-		} else {
-			bcc, err := os.ReadFile(tmpfile)
-			gopp.ErrPrint(err, tmpfile)
-			lines = strings.Split(string(bcc), "\n")
-		}
-
-		for _, line := range lines {
-			if strings.Contains(line, stub) && !strings.Contains(line, "Private") {
-				// log.Println(line)
-				name := gopp.Lastof(strings.Split(line, " ")).Str()
-				signt, ok := demangle(name)
-				log.Println(name, ok, signt)
-				rets = append(rets, name, signt)
-			}
-			addsymrawline(filepath.Base(vx.(string)), line)
-		}
-		return
-	})
-	log.Println(gopp.Lenof(signtx), time.Since(nowt)) // about 1.1s
-	signt := gopp.IV2Strings(signtx.([]any))
+	signt := qtrt.LoadAllQtSymbols(stub)
+	log.Println(gopp.Lenof(signt), time.Since(nowt)) // about 1.1s
 	cp := gopp.NewCodePager()
 	for i := 0; i < len(signt); i += 2 {
 		oname := signt[i]
@@ -91,7 +52,7 @@ func main() {
 
 		// txt := fmt.Sprintf("// %s\nfunc () {\nsymname=\"%s\"\n}\n", dname, oname)
 		// fmt.Println(txt)
-		clz, mth := SplitMethod(dname)
+		clz, mth := qtrt.SplitMethod(dname)
 		cp.APf("", "// %s", dname)
 		cp.APf("", "func (me *%s) %s() {", clz, strings.Title(mth))
 		cp.APf("", "  name := \"%s\"", oname)
@@ -103,9 +64,9 @@ func main() {
 	codesnip := cp.ExportAll()
 	log.Println(codesnip)
 
-	log.Println(len(Classes), "mthcnt", len(dedups), "deduped", dedupedcnt, gopp.Bytes2Hum(gopp.DeepSizeof(Classes, 0)))
+	log.Println(len(qtrt.Classes), "mthcnt", len(qtrt.Symdedups), "deduped", qtrt.Symdedupedcnt, gopp.Bytes2Hum(gopp.DeepSizeof(qtrt.Classes, 0)))
 	{
-		bcc, err := json.Marshal(Classes)
+		bcc, err := json.Marshal(qtrt.Classes)
 		gopp.ErrPrint(err)
 		gopp.SafeWriteFile("Classes.json", bcc, 0644)
 		bcc = nil
@@ -113,8 +74,8 @@ func main() {
 		nowt := time.Now()
 		bcc, err = os.ReadFile("Classes.json")
 		gopp.ErrPrint(err)
-		Classes = nil
-		err = json.Unmarshal(bcc, &Classes)
+		qtrt.Classes = nil
+		err = json.Unmarshal(bcc, &qtrt.Classes)
 		gopp.ErrPrint(err)
 		log.Println("decode big json", time.Since(nowt)) // about 400ms
 		bcc = nil
@@ -122,7 +83,7 @@ func main() {
 
 	testcall()
 
-	Libman.Open()
+	// Libman.Open()
 
 	app := NewQGuiApplication(1, []string{"./heh.exe"}, 0)
 	ape := NewQQmlApplicationEngine(nil)
@@ -132,8 +93,8 @@ func main() {
 
 	log.Println("top -pid", os.Getpid())
 	time.Sleep(gopp.DurandSec(23, 3))
-	Classes = nil
-	dedups = nil
+	qtrt.Classes = nil
+	qtrt.Symdedups = nil
 	log.Println("clean vars")
 
 	gopp.Forever()

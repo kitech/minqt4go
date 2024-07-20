@@ -1,12 +1,14 @@
 package main
 
+import "github.com/qtui/qtrt"
+
 // ///
 type QObject struct {
 	Cthis voidptr
 }
 
 func (me *QObject) Connect(args ...any) {
-	callany(me.Cthis, args...)
+	qtrt.Callany(me.Cthis, args...)
 }
 func testcall() {
 	me := &QObject{}
@@ -18,12 +20,12 @@ type QGuiApplication struct {
 }
 
 func NewQGuiApplication(argc int, argv []string, flags int) *QGuiApplication {
-	cthis := callany(nil, argc, argv, flags)
+	cthis := qtrt.Callany(nil, argc, argv, flags)
 	return &QGuiApplication{cthis}
 }
 
 func (me *QGuiApplication) Exec() int {
-	callany(me.Cthis)
+	qtrt.Callany(me.Cthis)
 	return 0
 }
 
@@ -32,12 +34,12 @@ type QQmlApplicationEngine struct {
 }
 
 func NewQQmlApplicationEngine(obj *QObject) *QQmlApplicationEngine {
-	cthis := callany(nil, obj)
+	cthis := qtrt.Callany(nil, obj)
 	return &QQmlApplicationEngine{cthis}
 }
 
 func (me *QQmlApplicationEngine) Load(qmlfile string) {
-	callany(me.Cthis, qmlfile)
+	qtrt.Callany(me.Cthis, qmlfile)
 }
 
 /*
