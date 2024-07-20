@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
-	"minqt"
 	"reflect"
 	"strings"
+
+	"github.com/kitech/minqt"
 
 	"github.com/kitech/gopp/cgopp"
 )

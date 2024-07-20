@@ -2,6 +2,7 @@
 #define _MODEL_BASE_H_
 
 #include <QAbstractItemModel>
+#include <QtQml>
 
 class ListModelBase : public QAbstractListModel {
     Q_OBJECT;

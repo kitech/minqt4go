@@ -12,6 +12,10 @@ import (
 	"time"
 
 	"github.com/kitech/gopp"
+
+	_ "github.com/kitech/minqt/qtinline" // import这个包，链接还是慢
+	_ "github.com/qtui/qtmeta"
+	_ "github.com/qtui/qtrt"
 )
 
 /*

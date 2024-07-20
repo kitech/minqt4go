@@ -99,6 +99,11 @@ void* uninlineholder() {
     // (new QQuickImage());
     // (new QQuickAnimatedImage());
 
+    // 如何取构造函数的地址！！
+    // 如何取有重载的方法的地址！！
+    // works
+    {QString ( QString::*x )(int, int, int, QChar) const = &QString::arg;}
+    // {auto x  = &QString::QString;} // not works
 
     return nullptr;
 }
