@@ -1,7 +1,7 @@
 package qtinline
 
 /*
-#cgo LDFLAGS: -lQtInline -L../srcc/
+#cgo LDFLAGS: -lQtCoreInline -L../srcc/
 
 extern void set_callbackAllInherits(void*);
 */

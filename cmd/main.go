@@ -43,7 +43,10 @@ func main() {
 	globtmpl := fmt.Sprintf("%s/Qt*.framework/Qt*", libpfx)
 	libs, err := filepath.Glob(globtmpl)
 	gopp.ErrPrint(err, libs)
-	log.Println(libs, len(libs))
+	libnames := gopp.Mapdo(libs, func(vx any) any {
+		return filepath.Base(vx.(string))
+	})
+	log.Println(gopp.FirstofGv(libs), libnames, len(libs))
 	signtx := gopp.Mapdo(libs, func(idx int, vx any) (rets []any) {
 		log.Println(idx, vx, gopp.Bytes2Humz(gopp.FileSize(vx.(string))))
 		tmpfile := "symfiles/" + filepath.Base(vx.(string)) + ".sym"
@@ -124,6 +127,7 @@ func main() {
 	app := NewQGuiApplication(1, []string{"./heh.exe"}, 0)
 	ape := NewQQmlApplicationEngine(nil)
 	ape.Load("hh.qml")
+	log.Println("top -pid", os.Getpid())
 	app.Exec()
 
 	log.Println("top -pid", os.Getpid())

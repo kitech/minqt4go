@@ -14,6 +14,7 @@ extern void* _Z20cxxabi__cxa_demanglePcS_PmPi(void*, void*, void*, void*);
 */
 import "C"
 
+// /// \see ../srcc/demangle.cpp
 func demangle(name string) (string, bool) {
 	name4c := cgopp.CStringgc(name)
 
