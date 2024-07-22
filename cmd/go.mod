@@ -8,10 +8,11 @@ require (
 )
 
 require (
-	github.com/ebitengine/purego v0.7.1 // indirect
+	github.com/ebitengine/purego v0.7.1
 	github.com/kitech/dl v0.0.0-20201225001532-be4f4faa4070 // indirect
-	github.com/kitech/gopp/cgopp v0.0.0 // indirect
+	github.com/kitech/gopp/cgopp v0.0.0
 	github.com/qtui/qtclzsz v0.0.0 // indirect
+	github.com/qtui/qtsyms v0.0.0 // indirect
 )
 
 require (
@@ -35,6 +36,8 @@ require (
 replace github.com/qtui/qtrt => ../../qtui/qtrt
 
 replace github.com/qtui/qtclzsz => ../../qtui/qtclzsz
+
+replace github.com/qtui/qtsyms => ../../qtui/qtsyms
 
 replace github.com/qtui/qtqt => ../../qtui/qtqt
 

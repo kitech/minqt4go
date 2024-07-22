@@ -13,3 +13,6 @@ cxlib:
 	cp ../qmlcc/libQtQuickInline.* ../srcc/
 	#cp ../qtallcc/libQtAllInline.* ../srcc/
 
+clean:
+	rm qtsymbols.*
+	
