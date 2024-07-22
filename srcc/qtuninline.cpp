@@ -51,6 +51,7 @@ char* cxxabi__cxa_demangle(char*a0, char*a1, size_t *length, int *status) {
 
 static QString dummyqs("dummy&ref");
 void* uninlineholder() {
+    uintptr_t ptr = 0;
 #define nilobj(x) ((x*)0)
 
     if (nilobj(QObject)->metaObject()!=nullptr) { }
@@ -104,8 +105,10 @@ void* uninlineholder() {
     // works
     {QString ( QString::*x )(int, int, int, QChar) const = &QString::arg;}
     // {auto x  = &QString::QString;} // not works
+    ptr += (uintptr_t)(new QString("abc"));
+    QString::fromUtf8(0, 0);
 
-    return nullptr;
+    return (void*)ptr;
 }
 
 const char* QCompileVersion() { return QT_VERSION_STR; }
