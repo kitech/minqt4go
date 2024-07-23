@@ -107,6 +107,9 @@ void* uninlineholder() {
     // {auto x  = &QString::QString;} // not works
     ptr += (uintptr_t)(new QString("abc"));
     QString::fromUtf8(0, 0);
+    {delete ((QString*)0);}
+
+    nilobj(QByteArray)->length();
 
     return (void*)ptr;
 }
@@ -182,11 +185,9 @@ int QVariantToDouble(QVariant*p, double* v) {
     return 1;
 }
 
+void QByteArrayDtor(void*px) { delete (QByteArray*)px; }
 
-void QStringDtor(void*px) {
-    auto p = (QString*)(px);
-    delete p;
-}
+void QStringDtor(void*px) { delete (QString*)px; }
 void* QStringNew(const char*p) {
     auto rv = new QString(p);
     return (void*)rv;

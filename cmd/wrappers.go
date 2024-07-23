@@ -1,6 +1,9 @@
 package main
 
-import "github.com/qtui/qtrt"
+import (
+	"github.com/kitech/gopp"
+	"github.com/qtui/qtrt"
+)
 
 // ///
 type QObject struct {
@@ -20,8 +23,8 @@ type QGuiApplication struct {
 }
 
 func NewQGuiApplication(argc int, argv []string, flags int) *QGuiApplication {
-	cthis := qtrt.Callany(nil, argc, argv, flags)
-	return &QGuiApplication{cthis}
+	ptr := qtrt.Callany(nil, argc, argv, flags)
+	return &QGuiApplication{gopp.FatptrAs[voidptr](ptr)}
 }
 
 func (me *QGuiApplication) Exec() int {
@@ -34,7 +37,8 @@ type QQmlApplicationEngine struct {
 }
 
 func NewQQmlApplicationEngine(obj *QObject) *QQmlApplicationEngine {
-	cthis := qtrt.Callany(nil, obj)
+	ptr := qtrt.Callany(nil, obj)
+	cthis := gopp.FatptrAs[voidptr](ptr)
 	return &QQmlApplicationEngine{cthis}
 }
 

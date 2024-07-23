@@ -43,13 +43,24 @@ func main() {
 	// sitter.NewLanguage()
 
 	var nowt = time.Now()
-	signt := qtsyms.LoadAllQtSymbols(stub)
+	signt := qtsyms.LoadAllQtSymbols()
 	log.Println(gopp.Lenof(signt), time.Since(nowt)) // about 1.1s
-	os.Exit(0)
+	// os.Exit(0)
+	gopp.Mapdo(qtsyms.QtSymbols, func(idx int, clz string, mths []qtsyms.QtMethod) {
+		// log.Println(idx, clz, mths)
+		for _, mtho := range mths {
+			if gopp.StrHaveNocase(mtho.CCSym, stub) {
+				decsym, ok := qtsyms.Demangle(mtho.CCSym)
+				gopp.FalsePrint(ok, mtho.CCSym)
+				signt = append(signt, mtho.CCSym, decsym)
+			}
+		}
+	})
+	log.Println(gopp.Lenof(signt), time.Since(nowt)) // about 1.1s
 
 	cp := gopp.NewCodePager()
 	for i := 0; i < len(signt); i += 2 {
-		oname := signt[i]
+		// oname := signt[i]
 		dname := signt[i+1]
 		if strings.HasPrefix(dname, "typeinfo for") ||
 			strings.HasPrefix(dname, "non-virtual thunk to") ||
@@ -62,12 +73,25 @@ func main() {
 		// txt := fmt.Sprintf("// %s\nfunc () {\nsymname=\"%s\"\n}\n", dname, oname)
 		// fmt.Println(txt)
 		clz, mth := qtsyms.SplitMethod(dname)
+		log.Println(dname, clz, mth)
 		cp.APf("", "// %s", dname)
-		cp.APf("", "func (me *%s) %s() {", clz, strings.Title(mth))
-		cp.APf("", "  name := \"%s\"", oname)
-		cp.AP("", "  sym := dlsym(name)")
-		cp.AP("", "  rv := cgopp.FfiCall(sym)")
-		cp.AP("", "}\n")
+		if clz == mth {
+			cp.APf("", "func  %sNew%d() {", clz)
+			cp.AP("", "  rv := qtrt.Callany(nil)")
+			cp.AP("", "  _ = rv")
+			cp.AP("", "}\n")
+		} else {
+			cp.APf("", "func (me *%s) %s() {", clz, strings.Title(mth))
+			cp.AP("", "  rv := qtrt.Callany(nil)")
+			cp.AP("", "  _ = rv")
+			cp.AP("", "}\n")
+		}
+		// cp.APf("", "func (me *%s) %s() {", clz, strings.Title(mth))
+		// cp.APf("", "  name := \"%s\"", oname)
+		// cp.AP("", "  fnsym := qtrt.GetQtSymAddr(name)")
+		// cp.AP("", "  rv := cgopp.FfiCall[gopp.Fatptr](fnsym)")
+		// cp.AP("", "}\n")
+
 	}
 
 	codesnip := cp.ExportAll()
@@ -75,9 +99,12 @@ func main() {
 
 	log.Println(len(qtsyms.QtSymbols), "mthcnt", len(qtsyms.Symdedups), "deduped", qtsyms.Symdedupedcnt, gopp.Bytes2Hum(gopp.DeepSizeof(qtsyms.QtSymbols, 0)))
 
+	if true {
+		return
+	}
 	testcall()
 
-	log.Println("top -pid", os.Getpid())
+	log.Println("top -pid", os.Getpid(), "lsof -p", os.Getpid())
 	// gopp.PauseAk() // 到这儿，内存24M
 
 	app := NewQGuiApplication(1, []string{"./heh.exe"}, 0)
@@ -88,7 +115,7 @@ func main() {
 	log.Println("top -pid", os.Getpid())
 
 	// gopp.PauseAk() // 到这儿，内存28M
-	log.Println("app.Exec ...")
+	log.Println("app.Exec ...", "top -pid", os.Getpid(), "lsof -p", os.Getpid())
 	app.Exec() // 到这儿，内存32M
 
 	log.Println("top -pid", os.Getpid())

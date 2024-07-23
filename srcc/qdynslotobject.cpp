@@ -5,68 +5,84 @@
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
-
-#include "qdynslotobject.h"
-#include <QtCore/qbytearray.h>
-#include <QtCore/qmetatype.h>
-#if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'qdynslotobject.h' doesn't include <QObject>."
-#elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.10.0. It"
-#error "cannot be used with the include files from this version of Qt."
-#error "(The moc has changed too much.)"
-#endif
-
-#include <cassert>
 #include <QtCore>
 
-void QDynSlotObject::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
-{
-    Q_UNUSED(_o);
-    Q_UNUSED(_id);
-    Q_UNUSED(_c);
-    Q_UNUSED(_a);
+#include "qdynslotobject.h"
+// #include <QtCore/qbytearray.h>
+// #include <QtCore/qmetatype.h>
+// #include <QtCore/qtmochelpers.h>
 
-    QDynSlotObject* this_ = (QDynSlotObject*)_o;
-    // qDebug()<<"calling:"<< _o << _c << _id << this_->fnptr_;
-    if (this_->fnptr_ != 0) {
-        this_->fnptr_(_o, _c, _id, _a, this_->name_,
-                      this_->argc_, this_->argtys_, this_->cbptr_);
-    }
-    // qDebug()<<"called:"<< _o << _c << _id;
-}
+// #if !defined(Q_MOC_OUTPUT_REVISION)
+// #error "The header file 'qdynslotobject.h' doesn't include <QObject>."
+// #elif Q_MOC_OUTPUT_REVISION != 67
+// #error "This file was generated using the moc from 5.10.0. It"
+// #error "cannot be used with the include files from this version of Qt."
+// #error "(The moc has changed too much.)"
+// #endif
 
-const QMetaObject *QDynSlotObject::metaObject() const
-{
-    // qDebug()<<"hehehhe"<< QObject::d_ptr->metaObject;
-    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
-}
+// #include <cassert>
+// #include <QtCore>
 
-void *QDynSlotObject::qt_metacast(const char *_clname)
-{
-    if (!_clname) return nullptr;
-    if (!strcmp(_clname, this->qt_meta_stringdata.stringdata0))
-        return static_cast<void*>(this);
-    return QObject::qt_metacast(_clname);
-}
+// #ifdef QT_MOC_HAS_STRINGDATA
+// struct qt_meta_stringdata_CLASSDynSlotObjectENDCLASS_t {};
+// constexpr auto qt_meta_stringdata_CLASSQDynSlotObjectENDCLASS = QtMocHelpers::stringData(
+//     "QDynSlotObject",
+//     "dumnyslot",
+//     ""
+// );
+// #else  // !QT_MOC_HAS_STRINGDATA
+// #error "qtmochelpers.h not found or too old."
+// #endif // !QT_MOC_HAS_STRINGDATA
 
-int QDynSlotObject::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
-{
-    // qDebug()<<"called:"<<_c << _id;
-    _id = QObject::qt_metacall(_c, _id, _a);
-    if (_id < 0)
-        return _id;
-    if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 1)
-            qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
-    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 1)
-            *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 1;
-    }
-    return _id;
-}
+
+// void QDynSlotObject::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+// {
+//     Q_UNUSED(_o);
+//     Q_UNUSED(_id);
+//     Q_UNUSED(_c);
+//     Q_UNUSED(_a);
+
+//     QDynSlotObject* this_ = (QDynSlotObject*)_o;
+//     // qDebug()<<"calling:"<< _o << _c << _id << this_->fnptr_;
+//     if (this_->fnptr_ != 0) {
+//         this_->fnptr_(_o, _c, _id, _a, this_->name_,
+//                       this_->argc_, this_->argtys_, this_->cbptr_);
+//     }
+//     // qDebug()<<"called:"<< _o << _c << _id;
+// }
+
+// const QMetaObject *QDynSlotObject::metaObject() const
+// {
+//     // qDebug()<<"hehehhe"<< QObject::d_ptr->metaObject;
+//     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+// }
+
+// void *QDynSlotObject::qt_metacast(const char *_clname)
+// {
+//     if (!_clname) return nullptr;
+//     if (!strcmp(_clname, this->qt_meta_stringdata.stringdata0))
+//         return static_cast<void*>(this);
+//     return QObject::qt_metacast(_clname);
+// }
+
+// int QDynSlotObject::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+// {
+//     // qDebug()<<"called:"<<_c << _id;
+//     _id = QObject::qt_metacall(_c, _id, _a);
+//     if (_id < 0)
+//         return _id;
+//     if (_c == QMetaObject::InvokeMetaMethod) {
+//         if (_id < 1)
+//             qt_static_metacall(this, _c, _id, _a);
+//         _id -= 1;
+//     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+//         if (_id < 1)
+//             *reinterpret_cast<int*>(_a[0]) = -1;
+//         _id -= 1;
+//     }
+//     return _id;
+// }
+
 
 
 /////////////////////
@@ -104,12 +120,22 @@ void QDynSlotObject::setCallbackSlot(void *fnptr, char* name, int argc, int*argt
     std::string rdseqhex = rdseqbin.toHex().toUpper().data();
     // qDebug()<<rdseqbin.toHex().toUpper();
     assert(rdseqhex.size() == 16);
-    strcpy(&this->qt_meta_stringdata.stringdata0[14], rdseqhex.data());
+    // strcpy(&this->qt_meta_stringdata.stringdata0[14], rdseqhex.data());
 
-    this->staticMetaObject = {
-         { &QObject::staticMetaObject, this->qt_meta_stringdata.data,
-           this->qt_meta_data, qt_static_metacall, nullptr, nullptr},
-    };
+    // this->staticMetaObject = {
+    //      { &QObject::staticMetaObject, this->qt_meta_stringdata.data,
+    //        this->qt_meta_data, qt_static_metacall, nullptr, nullptr},
+    // };
+}
+
+void QDynSlotObject::qt_static_metacall_fwd(QObject *_o, QMetaObject::Call _c, int _id, void **_a) {
+    auto this_ = (QDynSlotObject*)_o;
+    // qDebug()<<__FUNCTION__<<__LINE__<<"calling:"<< _o << _c << _id << this_->fnptr_;
+    if (this_->fnptr_ != 0) {
+        this_->fnptr_(_o, _c, _id, _a, this_->name_,
+                        this_->argc_, this_->argtys_, this_->cbptr_);
+    }
+    // qDebug()<<__FUNCTION__<<__LINE__<<"called:"<< _o << _c << _id;
 }
 
 extern "C" Q_DECL_EXPORT
@@ -135,7 +161,7 @@ int main_test(int argc, char **argv)
     // qDebug() << "Basic QObject class size: " << sizeof(QDemoObject); // 16
     qDebug() << "Deep Custom QObject class size: " << sizeof(QDynSlotObject);
     qDebug() << "QMetaObject class size: " << sizeof(QMetaObject);
-    qDebug() << "meta stringdata class size: " << sizeof(struct QDynSlotObject::qt_meta_stringdata_QDynSlotObject_t);
+    // qDebug() << "meta stringdata class size: " << sizeof(struct QDynSlotObject::qt_meta_stringdata_QDynSlotObject_t);
 
     QDynSlotObject* dso = new QDynSlotObject((void*)&callback_slot_test, strdup("clicked123"), 0, 0, 0);
     QMetaObject* mto = (QMetaObject*)dso->metaObject();

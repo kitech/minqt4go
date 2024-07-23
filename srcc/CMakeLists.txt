@@ -31,7 +31,8 @@ qt_standard_project_setup()
 
 set(MAINSRC
     # ffi_invoke.cpp 
-    # qdynslotobject.cpp 
+    qdynslotobject.cpp qdynslotobject_moc.cpp
+    qdummyobject.cpp
     demangle.cpp
     callback_inherit.cpp             modelbase.cpp           qihotfix.cpp
     check_assert.cpp        mainglob.cpp                qtuninline.cpp

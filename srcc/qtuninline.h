@@ -36,6 +36,7 @@ bool QVariantTobool(QVariant*p);
 void* QVariantNewDouble(double v);
 int QVariantToDouble(QVariant*p, double* v);
 
+void QByteArrayDtor(void*px);
 void QStringDtor(void*px);
 void* QStringNew(const char*p);
 const char* QStringToutf8(QString* sp);
