@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-g -ggdb -O0 -DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG")
 
-set(CMAKE_VERBOSE_MAKEFILE true)
+# set(CMAKE_VERBOSE_MAKEFILE true)
 set(CMAKE_CXX_EXTENSIONS off)
 
 
@@ -30,6 +30,7 @@ qt_standard_project_setup()
 # message(${theffi})
 
 set(MAINSRC
+    QmlCppBridge.cpp
     qtuninline.cpp
 )
 qt_add_library(QtQuickInline SHARED ${MAINSRC})
