@@ -185,9 +185,15 @@ int QVariantToDouble(QVariant*p, double* v) {
     return 1;
 }
 
-void QByteArrayDtor(void*px) { delete (QByteArray*)px; }
+// 直接使用 extern "C"，不在头文件中写了
+extern "C" void QByteArrayDtor(void*px) { delete (QByteArray*)px; }
+extern "C" void _ZN10QByteArrayD2Ev_weakwrap(void*px) { delete (QByteArray*)px; }
 
-void QStringDtor(void*px) { delete (QString*)px; }
+extern "C" void QStringDtor(void*px) { delete (QString*)px; }
+extern "C" void _ZN7QStringD2Ev_weakwrap(void*px)  { delete (QString*)px; }
+extern "C" void _ZN7QStringC1EPKc_weakwrap(void*o, const char*p) {
+    new(o) QString(p);
+}
 void* QStringNew(const char*p) {
     auto rv = new QString(p);
     return (void*)rv;

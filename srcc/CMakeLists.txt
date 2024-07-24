@@ -14,9 +14,11 @@ set(CMAKE_CXX_EXTENSIONS off)
 
 
 find_package(Qt6 REQUIRED COMPONENTS Core)
+# find_package(Qt6 REQUIRED COMPONENTS UiTools)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 # find_package(Qt6 REQUIRED COMPONENTS Svg)
 # find_package(Qt6 REQUIRED COMPONENTS Xml)
+# find_package(Qt6 REQUIRED COMPONENTS Network)
 # declaretive
 find_package(Qt6 REQUIRED COMPONENTS Qml)
 find_package(Qt6 REQUIRED COMPONENTS QmlIntegration)
@@ -39,6 +41,9 @@ set(MAINSRC
 )
 qt_add_library(QtCoreInline SHARED ${MAINSRC})
 target_link_libraries(QtCoreInline PRIVATE
+    # Qt6::Network
+    # Qt6::Svg
+    # Qt6::Xml
     Qt6::Widgets Qt6::Qml Qt6::QmlIntegration Qt6::Quick
     Qt6::QuickControls2 Qt6::QuickTemplates2
     Qt6::QuickWidgets
