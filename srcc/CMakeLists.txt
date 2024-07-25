@@ -14,18 +14,19 @@ set(CMAKE_CXX_EXTENSIONS off)
 
 
 find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Gui)
 # find_package(Qt6 REQUIRED COMPONENTS UiTools)
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+# find_package(Qt6 REQUIRED COMPONENTS Widgets)
 # find_package(Qt6 REQUIRED COMPONENTS Svg)
 # find_package(Qt6 REQUIRED COMPONENTS Xml)
 # find_package(Qt6 REQUIRED COMPONENTS Network)
 # declaretive
-find_package(Qt6 REQUIRED COMPONENTS Qml)
-find_package(Qt6 REQUIRED COMPONENTS QmlIntegration)
-find_package(Qt6 REQUIRED COMPONENTS Quick)
-find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
-find_package(Qt6 REQUIRED COMPONENTS QuickTemplates2)
-find_package(Qt6 REQUIRED COMPONENTS QuickWidgets)
+# find_package(Qt6 REQUIRED COMPONENTS Qml)
+# find_package(Qt6 REQUIRED COMPONENTS QmlIntegration)
+# find_package(Qt6 REQUIRED COMPONENTS Quick)
+# find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
+# find_package(Qt6 REQUIRED COMPONENTS QuickTemplates2)
+# find_package(Qt6 REQUIRED COMPONENTS QuickWidgets)
 qt_standard_project_setup()
 
 # find_library(theffi libffi ffi REQUIRED)
@@ -36,19 +37,23 @@ set(MAINSRC
     qdynslotobject.cpp qdynslotobject_moc.cpp
     qdummyobject.cpp
     demangle.cpp
-    callback_inherit.cpp             modelbase.cpp           qihotfix.cpp
+    callback_inherit.cpp       
+    # modelbase.cpp
+    qihotfix.cpp
     check_assert.cpp        mainglob.cpp                qtuninline.cpp
 )
 qt_add_library(QtCoreInline SHARED ${MAINSRC})
 target_link_libraries(QtCoreInline PRIVATE
+    Qt6::Core
+    Qt6::Gui
     # Qt6::Network
     # Qt6::Svg
     # Qt6::Xml
-    Qt6::Widgets Qt6::Qml Qt6::QmlIntegration Qt6::Quick
-    Qt6::QuickControls2 Qt6::QuickTemplates2
-    Qt6::QuickWidgets
+    # Qt6::Widgets Qt6::Qml Qt6::QmlIntegration Qt6::Quick
+    # Qt6::QuickControls2 Qt6::QuickTemplates2
+    # Qt6::QuickWidgets
     # 以下添加 private header
-    Qt6::QuickPrivate Qt6::QuickControls2Private Qt6::QuickTemplates2Private
+    # Qt6::QuickPrivate Qt6::QuickControls2Private Qt6::QuickTemplates2Private
     # theffi
     # ${GOLIB}
 )

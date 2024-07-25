@@ -1,7 +1,13 @@
 
 #include <QtWidgets>
 
-void* qtwidget_uninline() {
+#define DBGLOG qDebug()<<__FUNCTION__<<__LINE__
+#define nilcxobj(x) ((x*)0)
+
+void* uninline_qtwidgets_holder() {
+    QApplication::aboutQt();
+    nilcxobj(QWidget)->resize(0,0);
+
     ((QWidget*)0)->size();
     ((QWidget*)0)->width();
     ((QWidget*)0)->height();

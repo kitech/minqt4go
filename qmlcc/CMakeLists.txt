@@ -30,6 +30,7 @@ qt_standard_project_setup()
 # message(${theffi})
 
 set(MAINSRC
+    ../srcc/modelbase.cpp
     QmlCppBridge.cpp
     qtuninline.cpp
 )
