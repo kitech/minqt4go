@@ -22,6 +22,8 @@ find_package(Qt6 REQUIRED COMPONENTS Qml)
 find_package(Qt6 REQUIRED COMPONENTS QmlIntegration)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS QuickControls2Material)
+find_package(Qt6 REQUIRED COMPONENTS QuickControls2Universal)
 find_package(Qt6 REQUIRED COMPONENTS QuickTemplates2)
 # find_package(Qt6 REQUIRED COMPONENTS QuickWidgets)
 qt_standard_project_setup()
@@ -39,9 +41,14 @@ target_link_libraries(QtQuickInline PRIVATE
     # Qt6::Widgets
     Qt6::Qml Qt6::QmlIntegration Qt6::Quick
     Qt6::QuickControls2 Qt6::QuickTemplates2
+    Qt6::QuickControls2Material
+    Qt6::QuickControls2Universal
     # Qt6::QuickWidgets
     # 以下添加 private header
-    Qt6::QuickPrivate Qt6::QuickControls2Private Qt6::QuickTemplates2Private
+    Qt6::QuickPrivate Qt6::QuickControls2Private
+    Qt6::QuickControls2MaterialPrivate
+    Qt6::QuickControls2UniversalPrivate
+    Qt6::QuickTemplates2Private
     # theffi
     # ${GOLIB}
 )

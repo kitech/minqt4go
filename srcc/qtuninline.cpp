@@ -50,6 +50,11 @@ void* uninline_qtcore_holder() {
 
     QCoreApplication::instance();
 
+    /////
+    delete (new QColor("")); new QColor(dummyqs); // 弱符号
+    new QColor(QStringView(dummyqs));
+    QColor::colorNames();
+
     return (void*)retv;
 }
 
@@ -162,6 +167,8 @@ const char* QStringToutf8(QString* sp) {
     return rv;
 }
 
+// new QStringList(); new QObjectList();
+
 ///////////
 // for QtObject::createQmlObject, or other also ok
 extern "C"
@@ -221,4 +228,25 @@ const char* QObjectObjectName(QObject*obj) {
 extern "C"
 void* cgoir_dlsym0(const char* name) {
     return dlsym(RTLD_DEFAULT, name);
+}
+
+
+///////
+extern "C"
+void _ZN6QColorC1ERK7QString_weakwrap(void*o, void*namex) {
+    auto name = *(QString*)namex;
+    new(o) QColor(name);
+}
+extern "C"
+void _ZN6QColorC1EPKc_weakwrap(void*o, char*name) {
+    new(o) QColor(name);
+}
+extern "C"
+void _ZN6QColorC1E11QStringView_weakwrap(void*o, QStringView name) {
+    new(o) QColor(name);
+}
+
+extern "C"
+void _ZN6QColorD2Ev(void*o) {
+    delete (QColor*)(o);
 }

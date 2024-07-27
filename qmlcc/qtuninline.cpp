@@ -14,6 +14,7 @@
 #include <QtQuick/private/qquicklistview_p.h>
 #include <QtQuick/private/qquickflickable_p.h>
 #include <QtQuick/private/qquickloader_p.h>
+#include <QtQuickControls2Material/private/qquickmaterialstyle_p.h>
 #include <QtQuickTemplates2/private/qquickmenubar_p.h>
 #include <QtQuickTemplates2/private/qquickmenu_p.h>
 #include <QtQuickTemplates2/private/qquickpopup_p.h>
@@ -44,6 +45,7 @@ void* uninline_qtquick_holder() {
 
     nilcxobj(QQmlApplicationEngine)->load(dummyqs);
     nilcxobj(QQuickApplicationWindow)->contentItem();
+    nilcxobj(QQmlEngine)->contextForObject(0);
 
     nilcxobj(QJSEngine)->collectGarbage();
     nilcxobj(QJSEngine)->objectOwnership(0);
