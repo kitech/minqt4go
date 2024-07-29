@@ -33,6 +33,11 @@ func main() {
 	runtime.LockOSThread()
 	flag.Parse()
 
+	if true {
+		aaa()
+		return
+	}
+
 	stub := flag.Arg(0)
 	if gopp.Empty(stub) {
 		log.Println("input some keywords like engine")

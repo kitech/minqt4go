@@ -1,17 +1,20 @@
 package main
 
 import (
-	"github.com/kitech/gopp"
 	"github.com/qtui/qtrt"
 )
+
+// deprecated file
 
 // ///
 type QObject struct {
 	Cthis voidptr
 }
 
+func (me *QObject) GetCthis() voidptr { return me.Cthis }
+
 func (me *QObject) Connect(args ...any) {
-	qtrt.Callany(me.Cthis, args...)
+	qtrt.Callany[int](me, args...)
 }
 func testcall() {
 	me := &QObject{}
@@ -22,13 +25,16 @@ type QGuiApplication struct {
 	Cthis voidptr
 }
 
+func (me *QGuiApplication) GetCthis() voidptr { return me.Cthis }
+
 func NewQGuiApplication(argc int, argv []string, flags int) *QGuiApplication {
-	ptr := qtrt.Callany(nil, argc, argv, flags)
-	return &QGuiApplication{gopp.FatptrAs[voidptr](ptr)}
+	// ptr := qtrt.Callany[voidptr](nil, argc, argv, flags)
+	// return &QGuiApplication{gopp.FatptrAs[voidptr](ptr)}
+	return nil
 }
 
 func (me *QGuiApplication) Exec() int {
-	qtrt.Callany(me.Cthis)
+	qtrt.Callany[int](me)
 	return 0
 }
 
@@ -36,14 +42,17 @@ type QQmlApplicationEngine struct {
 	Cthis voidptr
 }
 
+func (me *QQmlApplicationEngine) GetCthis() voidptr { return me.Cthis }
+
 func NewQQmlApplicationEngine(obj *QObject) *QQmlApplicationEngine {
-	ptr := qtrt.Callany(nil, obj)
-	cthis := gopp.FatptrAs[voidptr](ptr)
-	return &QQmlApplicationEngine{cthis}
+	// ptr := qtrt.Callany[voidptr](nil, obj)
+	// cthis := gopp.FatptrAs[voidptr](ptr)
+	// return &QQmlApplicationEngine{cthis}
+	return nil
 }
 
 func (me *QQmlApplicationEngine) Load(qmlfile string) {
-	qtrt.Callany(me.Cthis, qmlfile)
+	qtrt.Callany[int](me, qmlfile)
 }
 
 /*

@@ -3,7 +3,7 @@
 #include <QtCore>
 #include <QtGui>
 
-#include "qtuninline.h"
+// #include "qtuninline.h"
 
 #include <dlfcn.h>
 auto cgoppMallocgcfn = (void* (*)(int))dlsym(RTLD_DEFAULT, "cgoppMallocgc");
@@ -40,6 +40,7 @@ void* uninline_qtcore_holder() {
 
     nilcxobj(QByteArray)->length();
     if (nilcxobj(QVariant)->isValid()) {}
+    retv+=nilcxobj(QVariant)->typeId();
     new QAnyStringView("",0);
     {auto x = sizeof(QAnyStringView);}
     {retv+=nilcxobj(QAnyStringView)->size();}
@@ -47,6 +48,7 @@ void* uninline_qtcore_holder() {
 
     new QUrl(QString(dummyqs)); delete nilcxobj(QUrl);
     nilcxobj(QUrl)->setUrl(dummyqs);
+    nilcxobj(QUrl)->url();
 
     QCoreApplication::instance();
 
@@ -54,6 +56,7 @@ void* uninline_qtcore_holder() {
     delete (new QColor("")); new QColor(dummyqs); // 弱符号
     new QColor(QStringView(dummyqs));
     QColor::colorNames();
+    delete nilcxobj(QStringList); delete nilcxobj(QObjectList);
 
     return (void*)retv;
 }
@@ -63,44 +66,46 @@ void* uninline_qtgui_holder() {
     return 0;
 }
 
-extern "C"
-const char* QCompileVersion() { return QT_VERSION_STR; }
+extern "C" const char* QCompileVersion() { return QT_VERSION_STR; }
+
+extern "C" int qtapp_argc() {
+    auto args = QCoreApplication::arguments();
+    return args.size();
+}
+extern "C" char* qtapp_argat(int idx) {
+    auto args = QCoreApplication::arguments();
+    auto arg  = args.at(idx);
+    return strdup(arg.toUtf8().data());
+}
 
 // __attribute__((noinline))
-extern "C"
-void QVariantDtor(void*p) {
+extern "C" void QVariantDtor(void*p) {
     if (p!= nullptr) delete (QVariant*)p;
 }
 
-extern "C"
-void* QVariantNewInt(int v) {
+extern "C" void* QVariantNewInt(int v) {
     auto rv = new QVariant(v);
     return rv;
 }
-extern "C"
-int QVariantToint(QVariant*p) {
+extern "C" int QVariantToint(QVariant*p) {
     bool ok = false;
     return p->toInt(&ok);
 }
-extern "C"
-void* QVariantNewInt64(qint64 v) {
+extern "C" void* QVariantNewInt64(qint64 v) {
     auto rv = new QVariant(v);
     return rv;
 }
-extern "C"
-qint64 QVariantToint64(QVariant*p) {
+extern "C" qint64 QVariantToint64(QVariant*p) {
     bool ok = false;
     return p->toLongLong(&ok);
 }
-extern "C"
-void* QVariantNewStr(char*str) {
+extern "C" void* QVariantNewStr(char*str) {
     auto rv = new QVariant(QString(str));
     return rv;
 }
 // 有时go获取不到值，可能是dtor太快了
 // 分配新内存解决，但是用的go's mallogc
-extern "C"
-char* QVariantTostr(QVariant*p) {
+extern "C" char* QVariantTostr(QVariant*p) {
     // qDebug()<<__FUNCTION__<<__LINE__<<p->toString();
     auto v = p->toString();
     auto rv = (char*)cgoppMallocgcfn(v.length()+1);
@@ -108,12 +113,10 @@ char* QVariantTostr(QVariant*p) {
     return rv;
 }
 
-extern "C"
-QVariant* QVariantNewPtr(void*ptr) {
+extern "C" QVariant* QVariantNewPtr(void*ptr) {
     return new QVariant(quint64(ptr));
 }
-extern "C"
-void* QVariantToptr(QVariant*p) {
+extern "C" void* QVariantToptr(QVariant*p) {
     bool ok = false;
     // auto rv = p->toULongLong(&ok);
     // auto rv = p->value<QQuickItem*>(); // 这种方式对的
@@ -124,23 +127,19 @@ void* QVariantToptr(QVariant*p) {
     return (void*)rv;
 }
 
-extern "C"
-void* QVariantNewBool(bool v) {
+extern "C" void* QVariantNewBool(bool v) {
     auto rv = new QVariant(v);
     // qDebug()<<__FUNCTION__<<__LINE__<<v<<*rv<<sizeof(bool);
     return rv;
 }
-extern "C"
-bool QVariantTobool(QVariant*p) {
+extern "C" bool QVariantTobool(QVariant*p) {
     return p->toBool();
 }
-extern "C"
-void* QVariantNewDouble(double v) {
+extern "C" void* QVariantNewDouble(double v) {
     auto rv = new QVariant(v);
     return rv;
 }
-extern "C"
-int QVariantToDouble(QVariant*p, double* v) {
+extern "C" int QVariantToDouble(QVariant*p, double* v) {
     auto rv = p->toDouble();
     *v = rv;
     return 1;
@@ -168,6 +167,11 @@ const char* QStringToutf8(QString* sp) {
 }
 
 // new QStringList(); new QObjectList();
+extern "C"
+void _ZN5QListI7QStringED2Ev_weakwrap(void*px) { delete (QList<QString>*)(px); }
+extern "C"
+void _ZN5QListIP7QObjectED2Ev_weakwrap(void*px) { delete (QList<QObject*>*)(px); }
+
 
 ///////////
 // for QtObject::createQmlObject, or other also ok

@@ -7,12 +7,19 @@ require (
 	github.com/kitech/minqt/qtinline v0.0.0
 )
 
+require github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
+
+// require cmd/internal/objfile v0.0.0
+// replace cmd/internal/objfile => /nix/store/1p6vr83cgyfwm8517jhfmf6lypzhy3q2-go-1.22.3/share/go/src/cmd/internal/objfile
+require internal/objfile v0.0.0
+replace internal/objfile => ./internal/objfile
+
 require (
-	github.com/ebitengine/purego v0.7.1
+	github.com/ebitengine/purego v0.7.1 // indirect
 	github.com/kitech/dl v0.0.0-20201225001532-be4f4faa4070 // indirect
-	github.com/kitech/gopp/cgopp v0.0.0
+	github.com/kitech/gopp/cgopp v0.0.0 // indirect
 	github.com/qtui/qtclzsz v0.0.0 // indirect
-	github.com/qtui/qtsyms v0.0.0 // indirect
+	github.com/qtui/qtsyms v0.0.0
 )
 
 require (

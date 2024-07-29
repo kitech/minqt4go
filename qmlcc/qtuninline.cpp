@@ -14,6 +14,8 @@
 #include <QtQuick/private/qquicklistview_p.h>
 #include <QtQuick/private/qquickflickable_p.h>
 #include <QtQuick/private/qquickloader_p.h>
+#include <QtQuickLayouts/private/qquicklayout_p.h>
+#include <QtQuickLayouts/private/qquicklinearlayout_p.h>
 #include <QtQuickControls2Material/private/qquickmaterialstyle_p.h>
 #include <QtQuickTemplates2/private/qquickmenubar_p.h>
 #include <QtQuickTemplates2/private/qquickmenu_p.h>
@@ -21,10 +23,12 @@
 // #include <QtQuickTemplates2/private/qquickpopupitem_p.h>
 #include <QtQuickTemplates2/private/qquickpane_p.h>
 #include <QtQuickTemplates2/private/qquickswipe_p.h>
+#include <QtQuickTemplates2/private/qquickcontainer_p.h>
 #include <QtQuickTemplates2/private/qquicksplitview_p.h>
 #include <QtQuickTemplates2/private/qquickscrollview_p.h>
 #include <QtQuickTemplates2/private/qquickscrollbar_p.h>
 #include <QtQuickTemplates2/private/qquickaction_p.h>
+#include <QtQuickTemplates2/private/qquickicon_p.h>
 #include <QtQuickTemplates2/private/qquicklabel_p.h>
 #include <QtQuickTemplates2/private/qquicktextarea_p.h>
 // #include <QtQuickTemplates2/private/qquicktextedit_p.h>
@@ -89,7 +93,9 @@ void* uninline_qtquick_holder() {
     // (new QQuickImage());
     // (new QQuickAnimatedImage());
 
-
+    new QQuickColumnLayout();
+    new QQuickRowLayout();
+    new QQuickGridLayout();
 
     return (void*)ptr;
 }
@@ -141,6 +147,7 @@ QObject* QQmlApplicationEngineRootObject1(QQmlApplicationEngine*e) {
     auto objs = e->rootObjects();
     return objs.value(0);
 }
+
 extern "C"
 QQmlComponent* QQmlComponentNew1(void*engine, QObject* parent) {
     auto rv = new QQmlComponent((QQmlEngine*)engine, parent);
@@ -192,3 +199,11 @@ QQuickItem* QQuickStackView_replaceCurrentItem(QQuickStackView* me, QQuickItem* 
 }
 #endif
 
+extern "C"
+void _ZN15QQuickRowLayoutC2EP10QQuickItem_weakwrap(void*o, QQuickItem* parent) {
+    new(o) QQuickRowLayout(parent);
+}
+extern "C"
+void _ZN18QQuickColumnLayoutC2EP10QQuickItem_weakwrap(void*o, QQuickItem* parent) {
+    new(o) QQuickColumnLayout(parent);
+}
