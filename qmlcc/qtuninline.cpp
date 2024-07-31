@@ -5,6 +5,7 @@
 #include <QtQuickTemplates2>
 
 // private part
+#include <QtQml/private/qv4engine_p.h>
 #include <QtQuickTemplates2/private/qquickstackview_p.h>
 #include <QtQuickTemplates2/private/qquicktoolbutton_p.h>
 #include <QtQuickTemplates2/private/qquickbutton_p.h>
@@ -40,6 +41,7 @@
 #include <QtQuickTemplates2/private/qquicktooltip_p.h>
 
 
+
 #define DBGLOG qDebug()<<__FUNCTION__<<__LINE__
 #define nilcxobj(x) ((x*)0)
 
@@ -54,6 +56,7 @@ void* uninline_qtquick_holder() {
     nilcxobj(QJSEngine)->collectGarbage();
     nilcxobj(QJSEngine)->objectOwnership(0);
     nilcxobj(QJSEngine)->setObjectOwnership(0, QJSEngine::CppOwnership);
+    nilcxobj(QJSEngine)->handle();
 
     (new QQuickMenuBar());
     nilcxobj(QQuickMenuBar)->addMenu(0);
@@ -97,10 +100,20 @@ void* uninline_qtquick_holder() {
     new QQuickRowLayout();
     new QQuickGridLayout();
 
+
+
     return (void*)ptr;
 }
 
-
+///////
+extern "C"
+void* QV4ExecutionEngine_memoryManager(QV4::ExecutionEngine* v4) { 
+    return v4->memoryManager;
+}
+// extern "C"
+// void* QV4ExecutionEngine_memoryManager(QV4::ExecutionEngine* v4) { 
+//     return v4->memoryManager;
+// }
 
 // 适用于 qml attached property
 extern "C"

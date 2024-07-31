@@ -548,6 +548,33 @@ func (me QQmlApplicationEngine) RootObject() QObject {
 	return QObjectof(rv)
 }
 
+func (me QQmlApplicationEngine) Handle() *V4ExecutionEngine {
+	name := "_ZNK9QJSEngine6handleEv"
+	fnsym := dlsym(name)
+	rv := cgopp.FfiCall[voidptr](fnsym, me.Cthis)
+	return V4ExecutionEngineFromptr(rv)
+}
+
+// todo how simple get root object
+func Qmljsgc2(robj QObject) {
+	me := QMetaObjectof0()
+	me.InvokeQmlmf(robj, "jsgc")
+}
+
+func QJSEGC(obj QObject) {
+	symname := "_ZN9QJSEngine14collectGarbageEv"
+	sym := dlsym(symname)
+	rv := cgopp.Litfficallg(sym, obj.Cthis)
+	gopp.GOUSED(rv)
+}
+
+func QJSEOwnership(obj QObject) int {
+	symname := "_ZN9QJSEngine15objectOwnershipEP7QObject"
+	sym := dlsym(symname)
+	rv := cgopp.Litfficallg(sym, obj.Cthis)
+	return int(usize(rv))
+}
+
 // //////
 type QQmlComponentst struct {
 	QObject
@@ -668,7 +695,20 @@ func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) {
 			addrs[i] = vx.Data
 			a.Data = vx.Data
 			a.Tyname = cgopp.CStringaf("bool")
-
+		case voidptr:
+			addrs[i] = v
+			a.Data = (voidptr)(&(addrs[i]))
+			a.Tyname = cgopp.CStringaf("void*")
+		case QQuickItem:
+			addrs[i] = v.Cthis
+			a.Data = (voidptr)(&(addrs[i]))
+			a.Tyname = cgopp.CStringaf("QQuickItem*")
+		default:
+			ty := reflect.TypeOf(args[i])
+			log.Println(ty)
+			switch ty.Kind() {
+			case reflect.Pointer:
+			}
 		}
 		// a.Tyname = cgopp.CStringaf("QVariant")
 
@@ -721,26 +761,6 @@ func (me QMetaObject) InvokeQmlmf(obj QObject, slotname string, args ...any) {
 }
 func QMOInvokeQmlmf(obj QObject, slotname string, args ...any) {
 	((QMetaObject)(nil)).InvokeQmlmf(obj, slotname, args...)
-}
-
-// todo how simple get root object
-func Qmljsgc2(robj QObject) {
-	me := QMetaObjectof0()
-	me.InvokeQmlmf(robj, "jsgc")
-}
-
-func QJSEGC(obj QObject) {
-	symname := "_ZN9QJSEngine14collectGarbageEv"
-	sym := dlsym(symname)
-	rv := cgopp.Litfficallg(sym, obj.Cthis)
-	gopp.GOUSED(rv)
-}
-
-func QJSEOwnership(obj QObject) int {
-	symname := "_ZN9QJSEngine15objectOwnershipEP7QObject"
-	sym := dlsym(symname)
-	rv := cgopp.Litfficallg(sym, obj.Cthis)
-	return int(usize(rv))
 }
 
 // ///
@@ -826,4 +846,89 @@ func (me QQuickToolTip) Z() (z float64) {
 	sym := dlsym(name)
 	z = cgopp.FfiCall[float64](sym, me.Cthis)
 	return
+}
+
+func Getqtcmdargonandroid() string {
+	var rv string
+	argcfn := cgopp.Dlsym0("qtapp_argc")
+	argatfn := cgopp.Dlsym0("qtapp_argat")
+	argc := cgopp.FfiCall[int](argcfn)
+	rv += gopp.ToStr(argc) + " "
+	for i := 0; i < argc; i++ {
+		argptr := cgopp.FfiCall[voidptr](argatfn, i)
+		rv += gopp.ToStr(i) + ":" + cgopp.GoString(argptr)
+		cgopp.Cfreepg(argptr)
+	}
+	log.Println("argc", argc, rv)
+
+	return rv
+}
+
+////////
+
+// https://code.qt.io/cgit/qt/qtdeclarative.git/tree/src/qml/memory/qv4mm_p.h?id=ac0a6ff966acfaf00ee0903581e30e5b1ac01aeb
+type V4MemoryManager struct {
+	// *qtrt.CObject
+	Cthis voidptr
+}
+
+func V4MemoryManagerFromptr(ptr voidptr) *V4MemoryManager {
+	return &V4MemoryManager{ptr}
+}
+func (me *V4MemoryManager) runGC() {
+
+}
+func (me *V4MemoryManager) ShouldRunGC() bool {
+	name := "_ZNK3QV413MemoryManager10getUsedMemEv"
+	// fnsym := qtrt.GetQtSymAddr(name)
+	fnsym := dlsym(name)
+	rv := cgopp.FfiCall[bool](fnsym, me.Cthis)
+	return rv
+}
+func (me *V4MemoryManager) DumpStats() {
+	name := "_ZNK3QV413MemoryManager9dumpStatsEv"
+	// fnsym := qtrt.GetQtSymAddr(name)
+	fnsym := dlsym(name)
+	cgopp.FfiCall[voidptr](fnsym, me.Cthis)
+
+}
+func (me *V4MemoryManager) GetUsedMem() usize {
+	name := "_ZNK3QV413MemoryManager10getUsedMemEv"
+	// fnsym := qtrt.GetQtSymAddr(name)
+	fnsym := dlsym(name)
+	rv := cgopp.FfiCall[usize](fnsym, me.Cthis)
+	return rv
+}
+func (me *V4MemoryManager) GetAllocatedMem() usize {
+	name := "_ZNK3QV413MemoryManager15getAllocatedMemEv"
+	// fnsym := qtrt.GetQtSymAddr(name)
+	fnsym := dlsym(name)
+	rv := cgopp.FfiCall[usize](fnsym, me.Cthis)
+	return rv
+}
+func (me *V4MemoryManager) GetLargeItemsMem() usize {
+	name := "_ZNK3QV413MemoryManager16getLargeItemsMemEv"
+	// fnsym := qtrt.GetQtSymAddr(name)
+	fnsym := dlsym(name)
+	rv := cgopp.FfiCall[usize](fnsym, me.Cthis)
+
+	return rv
+}
+
+// 这个类型是在 QV4 namespace 之内，就怕是不能正确执行符号查找
+type V4ExecutionEngine struct {
+	// *qtrt.CObject
+	Cthis voidptr
+}
+
+func V4ExecutionEngineFromptr(ptr voidptr) *V4ExecutionEngine {
+	return &V4ExecutionEngine{ptr}
+}
+
+func (me *V4ExecutionEngine) MemoryManager() *V4MemoryManager {
+	name := "QV4ExecutionEngine_memoryManager"
+	// fnsym := qtrt.GetQtSymAddr(name)
+	fnsym := dlsym(name)
+	rv := cgopp.FfiCall[voidptr](fnsym, me.Cthis)
+	return V4MemoryManagerFromptr(rv)
 }
