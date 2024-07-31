@@ -655,7 +655,7 @@ func QMethodof(name string) string { return fmt.Sprintf("0%s", name) }
 func QSlotof(name string) string   { return fmt.Sprintf("1%s", name) }
 func QSignalof(name string) string { return fmt.Sprintf("2%s", name) }
 
-func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) {
+func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) voidptr {
 	var argv [3]voidptr
 	var addrs [3]voidptr // 为了取地址使用，另一个作用是保持引用
 
@@ -719,9 +719,14 @@ func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) {
 	symname := "QMetaObjectInvokeMethod2"
 	sym := dlsym(symname)
 	name4c := cgopp.CStringaf(slotname)
-	rv := cgopp.Litfficallg(sym, obj.Cthis, name4c, argv[0], argv[1], argv[2])
-	// gopp.Println(rv, sym, slotname)
+	retp := &QArgument{}
+	// var ptr0 voidptr
+	// retp.Data = (voidptr)(&ptr0)
+	// retp.Tyname = cgopp.CStringaf("void*")
+	rv := cgopp.Litfficallg(sym, obj.Cthis, name4c, voidptr(retp), argv[0], argv[1], argv[2])
+	// gopp.Println(rv, sym, slotname, retp)
 	gopp.GOUSED(rv)
+	return nil
 }
 func QMOInvoke2(obj QObject, slotname string, args ...any) {
 	QMetaObjectof0().Invoke2(obj, slotname, args...)
@@ -732,8 +737,8 @@ func QMOInvoke2(obj QObject, slotname string, args ...any) {
 func (me QMetaObject) InvokeQmlmf(obj QObject, slotname string, args ...any) {
 	var argv [3]voidptr
 
-	a0 := &QArgument{}
 	if false {
+		a0 := &QArgument{}
 		a0.Data = QVarintNew2(123).Cthis
 		a0.Tyname = cgopp.CStringaf("QVariant")
 		argv[0] = (voidptr)(a0)
@@ -755,8 +760,12 @@ func (me QMetaObject) InvokeQmlmf(obj QObject, slotname string, args ...any) {
 	sym := dlsym(symname)
 	name4c := cgopp.StrtoRefc(&slotname)
 	// log.Println(args, slotname, argv)
-	rv := cgopp.Litfficallg(sym, obj.Cthis, name4c, argv[0], argv[1], argv[2])
-	// gopp.Println(rv, sym, slotname)
+	retp := &QArgument{}
+	// var ptr0 voidptr
+	// retp.Data = (voidptr)(&ptr0)
+	// retp.Tyname = cgopp.CStringaf("QVariant")
+	rv := cgopp.Litfficallg(sym, obj.Cthis, name4c, retp, argv[0], argv[1], argv[2])
+	// gopp.Println(rv, sym, slotname, retp)
 	gopp.GOUSED(rv)
 }
 func QMOInvokeQmlmf(obj QObject, slotname string, args ...any) {
