@@ -76,13 +76,36 @@ func (me *ListModelBase) Update(d Datar) bool {
 	gopp.TruePrint(idx < 0, "notfound", d.DedupKey())
 	// log.Println(idx, me.datas.Count())
 	if idx >= 0 {
+		// 如果不通过删除，修改要在下次重绘时生效!!!
 		me.BeginChangeRows(idx, idx, true)
 		me.datas.Del(d.DedupKey())
 		me.EndChangeRows(true)
 		// log.Println(idx, me.datas.Count())
 
+		// var ok = true
 		ok := me.Add(d)
 		return ok
+	}
+	return false
+}
+func (me *ListModelBase) SetData(d Datar, value any, role int) bool {
+	idx := me.datas.Indexof(d.DedupKey())
+	gopp.TruePrint(idx < 0, "notfound", d.DedupKey())
+	if idx >= 0 {
+		qvar := QVarintNew2(value)
+		symname := "_ZN13ListModelBase7setDataEiP8QVarianti"
+		fnsym := dlsym(symname)
+		rv := cgopp.FfiCall[bool](fnsym, me.cppimpl, idx, qvar.Cthis, role)
+		return rv
+	}
+	return false
+}
+func (me *ListModelBase) SetData2(d Datar, role int) bool {
+	idx := me.datas.Indexof(d.DedupKey())
+	gopp.TruePrint(idx < 0, "notfound", d.DedupKey())
+	if idx >= 0 {
+		me.DataChanged(idx, idx, role)
+		return true
 	}
 	return false
 }
@@ -351,4 +374,10 @@ func (me *ListModelBase) EndChangeRows(remove bool) {
 	var fnv func(voidptr)
 	purego.RegisterFunc(&fnv, usize(sym))
 	fnv(me.cppimpl)
+}
+
+func (me *ListModelBase) DataChanged(first, last int, role int) {
+	symname := "_ZN13ListModelBase15emitDataChangedEiii"
+	fnadr := dlsym(symname)
+	cgopp.FfiCall[int](fnadr, me.cppimpl, first, last, role)
 }

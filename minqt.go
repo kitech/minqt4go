@@ -419,7 +419,7 @@ func QVarintNew[T int | int64 | string | voidptr | bool | float64](vx T) QVarian
 func (me QVariant) Toint() int {
 	sym := dlsym("QVariantToint")
 	rv := cgopp.Litfficallg(sym, me.Cthis)
-	return int(usize(rv))
+	return int(int32(usize(rv))) // cint is int32 or will get 4294967295
 }
 func (me QVariant) Toint64() int64 {
 	sym := dlsym("QVariantToint64")

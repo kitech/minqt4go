@@ -33,9 +33,11 @@ public:
     virtual void mySetObjectName(const QString& c) ;
     
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const ;
+    bool setData(int row, QVariant* value, int role);
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
     void emitBeginChangeRows(int first, int last, int remove);
+    void emitDataChanged(int first, int last, int role);
 
 protected:
     // return the roles mapping to be used ny QML

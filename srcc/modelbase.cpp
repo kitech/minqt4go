@@ -99,6 +99,13 @@ QVariant ListModelBase::data(const QModelIndex &index, int role) const {
     return rv;
 }
 
+bool ListModelBase::setData(int row, QVariant* value, int role) {
+    auto mi = index(row, 0);
+    bool rv =  QAbstractListModel::setData(mi, QVariant(*value), role);
+    emit dataChanged(mi, mi);
+    return rv;
+}
+
 // extern "C" int goimplListModelBaseRowCount(qint64);
 int ListModelBase:: rowCount(const QModelIndex &parent) const {
     typedef int (*fnty)(qint64);
@@ -116,4 +123,11 @@ void ListModelBase::emitBeginChangeRows(int first, int last, int remove) {
     }else{
         emit beginInsertRows(QModelIndex(), first, last);
     }
+}
+void ListModelBase::emitDataChanged(int first, int last, int role) {
+    // qDebug()<<__FUNCTION__<<__LINE__<<first<<last<<role;
+    auto mi0 = index(first, 0);
+    auto mi1 = index(last, 0);
+    auto roles = QList<int>{role};
+    emit dataChanged(mi0, mi1, roles);
 }
