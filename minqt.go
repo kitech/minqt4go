@@ -864,6 +864,42 @@ func (me QQuickToolTip) Z() (z float64) {
 	return
 }
 
+// infact it's QQuickContainer!!!
+type QQuickSplitterst struct {
+	QObject
+}
+type QQuickSplitter = *QQuickSplitterst
+
+func QQuickSplitterof(ptr voidptr) QQuickSplitter {
+	me := &QQuickSplitterst{QObjectof(ptr)}
+	return me
+}
+func (me *QQuickSplitterst) ItemAt(idx int) QQuickItem {
+	name := "_ZNK15QQuickContainer6itemAtEi"
+	sym := dlsym(name)
+	rv := cgopp.FfiCall[voidptr](sym, me.Cthis, idx)
+	return QQuickItemof(rv)
+}
+func (me *QQuickSplitterst) TakeItem(idx int) QQuickItem {
+	name := "_ZN15QQuickContainer8takeItemEi"
+	sym := dlsym(name)
+	rv := cgopp.FfiCall[voidptr](sym, me.Cthis, idx)
+	return QQuickItemof(rv)
+}
+func (me *QQuickSplitterst) RemoveItem(item QQuickItem) {
+	name := "_ZN15QQuickContainer10removeItemEP10QQuickItem"
+	sym := dlsym(name)
+	cgopp.FfiCall[int](sym, me.Cthis, item.Cthis)
+}
+func (me *QQuickSplitterst) Count() int {
+	name := "_ZNK15QQuickContainer5countEv"
+	sym := dlsym(name)
+	rv := cgopp.FfiCall[int](sym, me.Cthis)
+	return rv
+}
+
+/////
+
 func Getqtcmdargonandroid() string {
 	var rv string
 	argcfn := cgopp.Dlsym0("qtapp_argc")

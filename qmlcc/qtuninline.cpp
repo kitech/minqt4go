@@ -101,6 +101,7 @@ void* uninline_qtquick_holder() {
     new QQuickGridLayout();
 
 
+    nilcxobj(QQuickContainer)->count();
 
     return (void*)ptr;
 }
