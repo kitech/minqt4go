@@ -114,8 +114,9 @@ extern "C" char* QVariantTostr(QVariant*p) {
 }
 
 extern "C" QVariant* QVariantNewPtr(void*ptr) {
-    return new QVariant(quint64(ptr));
+    return new QVariant((quint64)(ptr));
 }
+// todo only support QObject*
 extern "C" void* QVariantToptr(QVariant*p) {
     bool ok = false;
     // auto rv = p->toULongLong(&ok);
@@ -158,6 +159,13 @@ extern "C"
 void* QStringNew(const char*p) {
     auto rv = new QString(p);
     return (void*)rv;
+}
+extern "C"
+void* QStringNew2(const char*p, int len) {
+    QByteArray rv(p, len);
+    auto rv2 = new QString(rv.data());
+    DBGLOG << *rv2 << rv2->length();
+    return (void*)rv2;
 }
 extern "C"
 const char* QStringToutf8(QString* sp) {
@@ -226,8 +234,51 @@ extern "C"
 const char* QObjectObjectName(QObject*obj) {
     auto rvx = obj->objectName();
     auto rv = (char*)cgoppMallocgcfn(rvx.length()+1);
-    strcpy(rv, qUtf8Printable(rv));
+    strcpy(rv, qUtf8Printable(rvx));
     return rv;
+}
+
+extern "C"
+const char* QMetaObjectNormalizedSignature(const char*signt) {
+    auto rvx = QMetaObject::normalizedSignature(signt);
+    auto rv = (char*)cgoppMallocgcfn(rvx.length()+1);
+    strcpy(rv, qUtf8Printable(rvx));
+    return rv;
+}
+
+extern "C"
+const QMetaObject* QObjectVtableMetaObject(QObject*obj) {
+    return obj->metaObject();
+}
+
+extern "C"
+int QObjectSignalArgTypes(QObject*obj, const char*signt, void*fnsym) {
+    auto mto = obj->metaObject();
+    auto mthcnt = mto->methodCount();
+    DBGLOG << mto->className() ;
+    DBGLOG << signt;
+    auto signt2 = QMetaObject::normalizedSignature(signt);
+    DBGLOG << signt2;
+    for (int i = 0; i < mthcnt; i++) {
+        auto mth = mto->method(i);
+        DBGLOG << signt << i << mth.methodSignature();
+    }
+    auto sigidx = mto->indexOfSignal(signt);
+    DBGLOG << sigidx;
+    int (QMetaObject::*mthadr)(const char *) const = &QMetaObject::indexOfSignal;
+    DBGLOG << mthadr;
+
+    auto fnsym2 = dlsym(RTLD_DEFAULT, "_ZNK11QMetaObject13indexOfSignalEPKc");
+    DBGLOG << fnsym << fnsym2 << *(void**)(&mthadr); // alleq
+    // fnsym = *((void**)fnsym);
+    DBGLOG << fnsym;
+    DBGLOG << ((mto->*mthadr)(signt)); // works // 'is not a function'
+    int (*fno)(void*, const char*) = (int (*)(void*, const char*)) fnsym;
+    DBGLOG << fno << (void*)mto << (void*)obj->metaObject() <<(void*)obj;
+    sigidx = fno((void*)mto, signt);
+    DBGLOG << sigidx;
+
+    return sigidx;
 }
 
 /////

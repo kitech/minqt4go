@@ -61,6 +61,8 @@ type seqfnpair struct {
 var runuithfns = cmap.New[seqfnpair]()
 var runuithseq int64 = 10000
 
+// TODO 与 qtui/qtrt 中的实现冲突
+
 //export qtuithcbfningo
 func qtuithcbfningo(n *int64) {
 	key := fmt.Sprintf("%d", *n)
@@ -232,9 +234,14 @@ func (me QObject) Property(name string) QVariant {
 func (me QObject) FindChild(objname string) QObject {
 
 	sym := dlsym("QObjectFindChild1")
-	on4c := cgopp.StrtoRefc(&objname)
-	// on4c := cgopp.CString(objname)
+	// on4c := cgopp.StrtoRefc(&objname)
+	on4c := cgopp.CStringgc(objname)
 	// defer cgopp.Cfree(on4c)
+	// log.Println(sym, me.Cthis, on4c)
+	gopp.PackArgs(sym, me.Cthis, on4c)
+	if sym == nil || me.Cthis == nil || on4c == nil {
+		log.Println(sym, me.Cthis, on4c)
+	}
 	rv := cgopp.Litfficallg(sym, me.Cthis, on4c)
 	// gopp.NilPrint(rv, "fc404", objname, me.Dbgstr())
 	if rv == nil {

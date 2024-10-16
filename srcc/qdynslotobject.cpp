@@ -130,12 +130,12 @@ void QDynSlotObject::setCallbackSlot(void *fnptr, char* name, int argc, int*argt
 
 void QDynSlotObject::qt_static_metacall_fwd(QObject *_o, QMetaObject::Call _c, int _id, void **_a) {
     auto this_ = (QDynSlotObject*)_o;
-    // qDebug()<<__FUNCTION__<<__LINE__<<"calling:"<< _o << _c << _id << this_->fnptr_;
+    qDebug()<<__FUNCTION__<<__LINE__<<"calling:"<< _o << _c << _id << this_->fnptr_;
     if (this_->fnptr_ != 0) {
         this_->fnptr_(_o, _c, _id, _a, this_->name_,
                         this_->argc_, this_->argtys_, this_->cbptr_);
     }
-    // qDebug()<<__FUNCTION__<<__LINE__<<"called:"<< _o << _c << _id;
+    qDebug()<<__FUNCTION__<<__LINE__<<"called:"<< _o << _c << _id;
 }
 
 extern "C" Q_DECL_EXPORT

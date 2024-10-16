@@ -100,6 +100,8 @@ func (me *ListModelBase) SetData(d Datar, value any, role int) bool {
 	}
 	return false
 }
+
+// update notify only
 func (me *ListModelBase) SetData2(d Datar, role int) bool {
 	idx := me.datas.Indexof(d.DedupKey())
 	gopp.TruePrint(idx < 0, "notfound", d.DedupKey())
