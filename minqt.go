@@ -237,7 +237,6 @@ func (me QObject) FindChild(objname string) QObject {
 	// on4c := cgopp.StrtoRefc(&objname)
 	on4c := cgopp.CStringgc(objname)
 	// defer cgopp.Cfree(on4c)
-	// log.Println(sym, me.Cthis, on4c)
 	gopp.PackArgs(sym, me.Cthis, on4c)
 	if sym == nil || me.Cthis == nil || on4c == nil {
 		log.Println(sym, me.Cthis, on4c)
@@ -687,7 +686,7 @@ func (me QMetaObject) Invoke2(obj QObject, slotname string, args ...any) voidptr
 		// a.Data = v.Cthis
 		// a.Tyname = cgopp.StrtoRefc("QVariant")
 		// aty := reflect.TypeOf(args[i])
-		vx := (*cgopp.GoIface)(voidptr(&args[i]))
+		vx := (*gopp.GoIface)(voidptr(&args[i]))
 		switch v := args[i].(type) {
 		case charptr:
 			addrs[i] = voidptr(v)

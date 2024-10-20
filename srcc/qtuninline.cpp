@@ -38,17 +38,22 @@ void* uninline_qtcore_holder() {
     QString::fromUtf8(0, 0);
     {delete ((QString*)0);}
 
-    nilcxobj(QByteArray)->length();
+    retv += nilcxobj(QByteArray)->length();
     if (nilcxobj(QVariant)->isValid()) {}
     retv+=nilcxobj(QVariant)->typeId();
     new QAnyStringView("",0);
     {auto x = sizeof(QAnyStringView);}
     {retv+=nilcxobj(QAnyStringView)->size();}
     {retv+=(uintptr_t)nilcxobj(QAnyStringView)->data();}
+    retv += nilcxobj(QByteArrayView)->length();
 
     new QUrl(QString(dummyqs)); delete nilcxobj(QUrl);
     nilcxobj(QUrl)->setUrl(dummyqs);
     nilcxobj(QUrl)->url();
+
+    // 获取类型大小sizeof
+    QMetaType::fromName("QObject").sizeOf();
+    nilcxobj(QMetaType)->metaObject();
 
     QCoreApplication::instance();
 
@@ -182,6 +187,25 @@ void _ZN5QListIP7QObjectED2Ev_weakwrap(void*px) { delete (QList<QObject*>*)(px);
 
 
 ///////////
+//  QThread::staticMetaObject::metaType().sizeOf()
+//  QMetaType::fromName(QTime).sizeOf()
+extern "C"
+int GetClassSizeByName(const char* clsname) {
+    int clzsz = 0;
+    char buf[99] = {0};
+    sprintf(buf, "_ZN%d%s16staticMetaObjectE", int(strlen(clsname)), clsname);
+    void* stmo = dlsym(RTLD_DEFAULT, buf);
+    // DBGLOG<<clsname<<buf<<stmo<<(QThread::staticMetaObject.metaType().sizeOf());
+    if (stmo != nullptr) {
+        clzsz = ((QMetaObject*)stmo)->metaType().sizeOf();
+    } else {
+        QMetaType stmo2 = QMetaType::fromName(QByteArrayView(clsname));
+        clzsz = stmo2.sizeOf();
+    }
+
+    return clzsz;
+}
+
 // for QtObject::createQmlObject, or other also ok
 extern "C"
 void QObjectDtor(QObject* o) { delete o; }
