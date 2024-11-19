@@ -103,14 +103,16 @@ QDynSlotObject::QDynSlotObject(void *fnptr, char* name, int argc, int*argtys, vo
 QDynSlotObject::~QDynSlotObject() {
     memset(this->name_, 0, strlen(this->name_));
     free(this->name_);
+    free(this->argtys_);
 }
 
 void QDynSlotObject::setCallbackSlot(void *fnptr, char* name, int argc, int*argtys, void*cbptr)
 {
     fnptr_ = (void(*)(QObject*, int, int, void*, char*, int, int*, void*))fnptr;
-    name_ = name;
+    name_ = strdup(name);
     argc_ = argc;
-    argtys_ = argtys;
+    argtys_ = (int*)malloc(argc*sizeof(int));
+    memcpy(argtys_, argtys, argc*sizeof(int));
     cbptr_ = cbptr;
 
     // rewrite qt_meta_stringdata_ and qt_meta_data_ and staticMetaObject
@@ -130,7 +132,7 @@ void QDynSlotObject::setCallbackSlot(void *fnptr, char* name, int argc, int*argt
 
 void QDynSlotObject::qt_static_metacall_fwd(QObject *_o, QMetaObject::Call _c, int _id, void **_a) {
     auto this_ = (QDynSlotObject*)_o;
-    // qDebug()<<__FUNCTION__<<__LINE__<<"calling:"<< _o << _c << _id << this_->fnptr_;
+    // qDebug()<<__FUNCTION__<<__LINE__<<"calling:"<< _o << _c << _id << this_->fnptr_<<this_->name_;
     if (this_->fnptr_ != 0) {
         this_->fnptr_(_o, _c, _id, _a, this_->name_,
                         this_->argc_, this_->argtys_, this_->cbptr_);

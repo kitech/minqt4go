@@ -6,7 +6,7 @@ import (
 )
 
 /*
-#cgo LDFLAGS: -lc++
+#cgo macos LDFLAGS: -lc++
 
 // #include <cxxabi.h>
 // extern void* _Z20cxxabi__cxa_demanglePcS_PmPi(void*, void*, void*, void*);

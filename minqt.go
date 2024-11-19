@@ -5,6 +5,9 @@ import (
 	"log"
 	"reflect"
 	"regexp"
+
+	// "runtime"
+	"runtime/cgo"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -54,24 +57,21 @@ func call0(name string) voidptr {
 
 // todo
 type seqfnpair struct {
-	np *int64
-	f  func()
+	np  *int64
+	np2 int64
+	f   func()
 }
 
-var runuithfns = cmap.New[seqfnpair]()
 var runuithseq int64 = 10000
 
 // TODO 与 qtui/qtrt 中的实现冲突
 
 //export qtuithcbfningo
 func qtuithcbfningo(n *int64) {
-	key := fmt.Sprintf("%d", *n)
-	// log.Println(*n, key)
-	pair, ok := runuithfns.Get(key)
-	if ok {
-		pair.f()
-		runuithfns.Remove(key)
-	}
+	hno := cgo.Handle(usize(voidptr(n)))
+	cbv := hno.Value().(*seqfnpair)
+	hno.Delete()
+	cbv.f()
 }
 
 func RunonUithread(f func()) {
@@ -81,14 +81,12 @@ func RunonUithread(f func()) {
 	sym2 := dlsym("qtuithcbfningo")
 	// log.Println(sym, name, sym2)
 
-	seq := new(int64)
-	*seq = atomic.AddInt64(&runuithseq, 3)
-
-	key := fmt.Sprintf("%d", *seq)
-	runuithfns.Set(key, seqfnpair{seq, f})
-
-	cgopp.Litfficallg(sym, sym2, seq)
+	seq := atomic.AddInt64(&runuithseq, 3)
+	cbv := &seqfnpair{nil, seq, f}
+	hno := cgo.NewHandle(cbv)
+	cgopp.Litfficallg(sym, sym2, voidptr(usize(hno)))
 }
+
 func RunonUithreadx(fx any, args ...any) {
 	RunonUithread(func() { gopp.CallFuncx(fx, args...) })
 }
@@ -400,7 +398,9 @@ func QVarintNew[T int | int64 | string | voidptr | bool | float64](vx T) QVarian
 		sym := dlsym("QVariantNewStr")
 		// v4cc := cgopp.CString(v)
 		// defer cgopp.Cfree(v4cc)
-		v4cc := cgopp.StrtoRefc(&v)
+		// v4cc := cgopp.StrtoRefc(&v)
+		v4cc := gopp.CStringgc(v)
+		gopp.SetPin(v4cc, true)
 		rv := cgopp.Litfficallg(sym, v4cc)
 		return QVariantof(rv)
 	case voidptr:

@@ -14,6 +14,9 @@ void* uninline_qtwidgets_holder() {
     ((QPushButton*)0)->show();
     ((QLayout*)0)->addItem(0);
     new QSpacerItem(0,0,QSizePolicy::Minimum,QSizePolicy::Minimum);
+
+    nilcxobj(QSystemTrayIcon)->show();
+
     return (void*)(uintptr_t(0));
 }
 
