@@ -7,7 +7,7 @@ import (
 	"regexp"
 
 	// "runtime"
-	"runtime/cgo"
+	// "runtime/cgo"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -68,9 +68,10 @@ var runuithseq int64 = 10000
 
 //export qtuithcbfningo
 func qtuithcbfningo(n *int64) {
-	hno := cgo.Handle(usize(voidptr(n)))
-	cbv := hno.Value().(*seqfnpair)
-	hno.Delete()
+	// hno := cgo.Handle(usize(voidptr(n)))
+	// cbv := hno.Value().(*seqfnpair)
+	// hno.Delete()
+	cbv := (*seqfnpair)(voidptr(n))
 	cbv.f()
 }
 
@@ -83,8 +84,10 @@ func RunonUithread(f func()) {
 
 	seq := atomic.AddInt64(&runuithseq, 3)
 	cbv := &seqfnpair{nil, seq, f}
-	hno := cgo.NewHandle(cbv)
-	cgopp.Litfficallg(sym, sym2, voidptr(usize(hno)))
+	// hno := cgo.NewHandle(cbv)
+	// cgopp.Litfficallg(sym, sym2, voidptr(usize(hno)))
+	cgopp.Litfficallg(sym, sym2, voidptr(cbv))
+	gopp.ReftimedSec(cbv, 1)
 }
 
 func RunonUithreadx(fx any, args ...any) {
