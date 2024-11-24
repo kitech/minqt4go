@@ -261,6 +261,13 @@ const char* QObjectObjectName(QObject*obj) {
     strcpy(rv, qUtf8Printable(rvx));
     return rv;
 }
+extern "C"
+char *QObjectObjectName2(QObject *obj, int len, char*rv) {
+  auto rvx = obj->objectName();
+  assert(len > rvx.length());
+  strcpy(rv, qUtf8Printable(rvx));
+  return rv;
+}
 
 extern "C"
 const char* QMetaObjectNormalizedSignature(const char*signt) {

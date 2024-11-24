@@ -221,3 +221,7 @@ extern "C"
 void _ZN18QQuickColumnLayoutC2EP10QQuickItem_weakwrap(void*o, QQuickItem* parent) {
     new(o) QQuickColumnLayout(parent);
 }
+
+extern "C" QQuickButton *QQuickButtonNew1(QQuickItem *p) {
+  return new QQuickButton(p);
+}
