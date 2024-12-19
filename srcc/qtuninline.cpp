@@ -179,6 +179,13 @@ const char* QStringToutf8(QString* sp) {
     return rv;
 }
 
+// need client copy
+extern "C" const char *QStringToutf8p2(QString *sp) {
+    // auto rv = (char *)malloc(sp->length() * 2 + 1);
+    //strcpy(rv, qUtf8Printable((*sp)));
+    return qUtf8Printable((*sp));
+}
+
 // new QStringList(); new QObjectList();
 extern "C"
 void _ZN5QListI7QStringED2Ev_weakwrap(void*px) { delete (QList<QString>*)(px); }
