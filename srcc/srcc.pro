@@ -22,7 +22,10 @@ DEFINES += QT_VERSION=0x030308
 #            qihotfix.h \
 #            ../../fedimqt/srcc/qtutils.h
 
-SOURCES += qtuninline.cpp
+SOURCES += qtuninline.cpp \
+			qmitmsloter.cpp
+#			qdynslotobject3_moc.cpp
+
 # callback_inherit.cpp \
            # check_assert.cpp \
            # demangle.cpp \
