@@ -5,7 +5,7 @@
 
 hdrfile=qmitmsloter.h
 
-mocexes="$MOC moc moc-qt3 moc-qt4 moc-qt5 moc-qt6"
+mocexes="$MOC moc moc-qt3 moc-qt4 moc-qt5 moc-qt6 /usr/lib/qt6/moc"
 for mocexe in $mocexes; do
     exepath=$(which $mocexe >/dev/null 2>&1)
     rc=$?
@@ -25,7 +25,6 @@ for mocexe in $mocexes; do
     if [ x"$hasswitch" != x"" ]; then # qt3
         sed -i 's/switch ( _id/metacallir(_id,_o);\n\tswitch ( _id/' tmpmoc.cxx
     else # qt4+
-        grep "switch " tmpmoc.cxx
         # switch (_id) {
         sed -i 's/switch (_id)/metacallir(_o,_c,_id,_a);\n\tswitch (_id)/' tmpmoc.cxx
     fi

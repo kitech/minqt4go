@@ -49,7 +49,7 @@ void QMitmSloter::metacallir(QObject *_o, QMetaObject::Call _c, int _id, void **
 #elif QT_VERSION < 0x060000
 #include "qmitmsloter_moc_v5.15.17.cxx"
 #elif QT_VERSION < 0x070000
-#include "qmitmsloter_moc_v6.0.0.cxx"
+#include "qmitmsloter_moc_v6.10.0.cxx"
 #else
 #warning "not support QT_VERSION"
 #endif
