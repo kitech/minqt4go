@@ -20,13 +20,16 @@ for mocexe in $mocexes; do
     verstr=$(grep "#error \"This file was generated using the moc from" tmpmoc.cxx|awk '{print $10}')
     echo "verstr=${verstr}"
 
-    hast=$(grep "_t->dummy();" tmpmoc.cxx)
-    echo $hast
-    if [ x"$hast" == x"" ]; then
-        sed -i 's/dummy();/metacallir(_id,_o);/' tmpmoc.cxx
-    else
-        sed -i 's/_t->dummy();/_t->metacallir(_o,_c,_id,_a);/' tmpmoc.cxx
+    hasswitch=$(grep "switch ( _id" tmpmoc.cxx)
+    echo "*M*: $hasswitch"
+    if [ x"$hasswitch" != x"" ]; then # qt3
+        sed -i 's/switch ( _id/metacallir(_id,_o);\n\tswitch ( _id/' tmpmoc.cxx
+    else # qt4+
+        grep "switch " tmpmoc.cxx
+        # switch (_id) {
+        sed -i 's/switch (_id)/metacallir(_o,_c,_id,_a);\n\tswitch (_id)/' tmpmoc.cxx
     fi
+
     grep "metacallir" tmpmoc.cxx
 
     dstfile="qmitmsloter_moc_v${verstr}cxx"

@@ -3,11 +3,9 @@
 
 #include "qmitmsloter.h"
 
-void QMitmSloter::dummy() {}
-
 // maybe useful, senderSignalIndex(>=qt4)
 // QSignalMapper , QSignalSpy
-
+///////
 // see qtrt.ConnCbdata
 typedef struct ConnCbdata {
 	void* fnptr;
@@ -21,19 +19,26 @@ QMitmSloter::QMitmSloter(void* d_) : QObject() {
 }
 
 #if QT_VERSION < 0x040000
-void QMitmSloter::metacallir(int _id, QUObject* _o) {
+void QMitmSloter::metacallir(int _id, QUObject* _a) {
 	ConnCbdata* d = (ConnCbdata*)this->cbdata;
 	// std::cout<<__FUNCTION__<<_id<<_o<<std::endl;
-	printf("%s: %d, %p, d=%p\n", __FUNCTION__, _id, _o, this->cbdata);
+	printf("%s: %d, %p, d=%p\n", __FUNCTION__, _id, _a, this->cbdata);
 	
-	typedef void (*cbfnty)(void*, int, void*);
+	typedef void (*cbfnty)(void*, void*, int, int, void*);
 	cbfnty fno = (cbfnty)d->fnptr;
-	fno(d, _id, _o);
+	fno(d, this, 0,  _id, _a);
 }
 #else
+// _o: receiver object, this
+// _c: direct/queued
+// _id: slot inner id/index
+// _a: arguments with simple packed format
 void QMitmSloter::metacallir(QObject *_o, QMetaObject::Call _c, int _id, void **_a);
 {
 	ConnCbdata* d = (ConnCbdata*)this->cbdata;
+	typedef void (*cbfnty)(void*, void*, int, int, void*);
+	cbfnty fno = (cbfnty)d->fnptr;
+	fno(d, _o, _c, _id, _a);
 }
 #endif
 

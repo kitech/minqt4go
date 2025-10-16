@@ -65,6 +65,9 @@ void* uninline_qtcore_holder() {
     //QCoreApplication::instance();
 	//QApplication::instance();
 	
+	nilcxobj(QButton)->autoRepeat();
+	nilcxobj(QMetaObject)->className();
+	
     /////
     delete (new QColor("")); new QColor(dummyqs); // 弱符号
     //new QColor(QStringView(dummyqs));

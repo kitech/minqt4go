@@ -51,7 +51,7 @@ static const uint qt_meta_data_QMitmSloter[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       2,   14, // methods
+      12,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -59,11 +59,31 @@ static const uint qt_meta_data_QMitmSloter[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   24,    2, 0x0a /* Public */,
-       3,   13,   25,    2, 0x0a /* Public */,
+       1,    0,   74,    2, 0x0a /* Public */,
+       1,    1,   75,    2, 0x0a /* Public */,
+       1,    1,   78,    2, 0x0a /* Public */,
+       1,    1,   81,    2, 0x0a /* Public */,
+       1,    1,   84,    2, 0x0a /* Public */,
+       1,    1,   87,    2, 0x0a /* Public */,
+       1,    1,   90,    2, 0x0a /* Public */,
+       1,    1,   93,    2, 0x0a /* Public */,
+       1,    1,   96,    2, 0x0a /* Public */,
+       1,    1,   99,    2, 0x0a /* Public */,
+       1,    1,  102,    2, 0x0a /* Public */,
+       3,   13,  105,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,    2,
+    QMetaType::Void, QMetaType::Short,    2,
+    QMetaType::Void, QMetaType::Bool,    2,
+    QMetaType::Void, QMetaType::Float,    2,
+    QMetaType::Void, QMetaType::Double,    2,
+    QMetaType::Void, QMetaType::LongLong,    2,
+    QMetaType::Void, QMetaType::VoidStar,    2,
+    QMetaType::Void, QMetaType::QObjectStar,    2,
+    QMetaType::Void, QMetaType::QString,    2,
+    QMetaType::Void, QMetaType::QVariant,    2,
     QMetaType::Void, QMetaType::Char, QMetaType::Long, QMetaType::Float, QMetaType::Double, QMetaType::Int, QMetaType::Short, QMetaType::Bool, QMetaType::VoidStar, QMetaType::QObjectStar, QMetaType::QString, 0x80000000 | 4, QMetaType::QVariant, 0x80000000 | 5,    2,    2,    2,    2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
 
        0        // eod
@@ -74,9 +94,20 @@ void QMitmSloter::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
     if (_c == QMetaObject::InvokeMetaMethod) {
         auto *_t = static_cast<QMitmSloter *>(_o);
         (void)_t;
-        switch (_id) {
-        case 0: _t->metacallir(_o,_c,_id,_a); break;
-        case 1: _t->slotxx((*reinterpret_cast< char(*)>(_a[1])),(*reinterpret_cast< long(*)>(_a[2])),(*reinterpret_cast< float(*)>(_a[3])),(*reinterpret_cast< double(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5])),(*reinterpret_cast< short(*)>(_a[6])),(*reinterpret_cast< bool(*)>(_a[7])),(*reinterpret_cast< void*(*)>(_a[8])),(*reinterpret_cast< QObject*(*)>(_a[9])),(*reinterpret_cast< QString(*)>(_a[10])),(*reinterpret_cast< QString(*)>(_a[11])),(*reinterpret_cast< QVariant(*)>(_a[12])),(*reinterpret_cast< QVariant(*)>(_a[13]))); break;
+        metacallir(_o,_c,_id,_a);
+	switch (_id) {
+        case 0: _t->dummy(); break;
+        case 1: _t->dummy((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 2: _t->dummy((*reinterpret_cast< short(*)>(_a[1]))); break;
+        case 3: _t->dummy((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 4: _t->dummy((*reinterpret_cast< float(*)>(_a[1]))); break;
+        case 5: _t->dummy((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 6: _t->dummy((*reinterpret_cast< long long(*)>(_a[1]))); break;
+        case 7: _t->dummy((*reinterpret_cast< void*(*)>(_a[1]))); break;
+        case 8: _t->dummy((*reinterpret_cast< QObject*(*)>(_a[1]))); break;
+        case 9: _t->dummy((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 10: _t->dummy((*reinterpret_cast< QVariant(*)>(_a[1]))); break;
+        case 11: _t->slotxx((*reinterpret_cast< char(*)>(_a[1])),(*reinterpret_cast< long(*)>(_a[2])),(*reinterpret_cast< float(*)>(_a[3])),(*reinterpret_cast< double(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5])),(*reinterpret_cast< short(*)>(_a[6])),(*reinterpret_cast< bool(*)>(_a[7])),(*reinterpret_cast< void*(*)>(_a[8])),(*reinterpret_cast< QObject*(*)>(_a[9])),(*reinterpret_cast< QString(*)>(_a[10])),(*reinterpret_cast< QString(*)>(_a[11])),(*reinterpret_cast< QVariant(*)>(_a[12])),(*reinterpret_cast< QVariant(*)>(_a[13]))); break;
         default: ;
         }
     }
@@ -111,13 +142,13 @@ int QMitmSloter::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 2)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 2;
+        _id -= 12;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 2)
+        if (_id < 12)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 2;
+        _id -= 12;
     }
     return _id;
 }
