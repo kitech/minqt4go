@@ -15,15 +15,17 @@ typedef struct ConnCbdata {
 } ConnCbdata;
 
 QMitmSloter::QMitmSloter(void* d_) : QObject() {
-	this->cbdata = d_;
+	this->cbdata = d_; // d_ would be GCed???
+	this->cbdata = malloc(sizeof(ConnCbdata));
+	memcpy(this->cbdata, d_, sizeof(ConnCbdata));
 }
 
 #if QT_VERSION < 0x040000
 void QMitmSloter::metacallir(int _id, QUObject* _a) {
 	ConnCbdata* d = (ConnCbdata*)this->cbdata;
 	// std::cout<<__FUNCTION__<<_id<<_o<<std::endl;
-	printf("%s: %d, %p, d=%p\n", __FUNCTION__, _id, _a, this->cbdata);
-	
+	printf("%s: %d, %p, d=%p \t:%s:%d\n", __FUNCTION__, _id, _a, this->cbdata, __FILE__, __LINE__);
+
 	typedef void (*cbfnty)(void*, void*, int, int, void*);
 	cbfnty fno = (cbfnty)d->fnptr;
 	fno(d, this, 0,  _id, _a);

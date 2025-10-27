@@ -64,12 +64,14 @@ void* uninline_qtcore_holder() {
 
     //QCoreApplication::instance();
 	//QApplication::instance();
-	
+
+	nilcxobj(QWidget)->palette();
 	nilcxobj(QButton)->autoRepeat();
 	nilcxobj(QMetaObject)->className();
-	
+
     /////
     delete (new QColor("")); new QColor(dummyqs); // 弱符号
+    delete (new QColor(1,2,3));
     //new QColor(QStringView(dummyqs));
     QColor::colorNames();
     delete nilcxobj(QStringList); delete nilcxobj(QObjectList);
@@ -319,17 +321,17 @@ int QObjectSignalArgTypes(QObject*obj, const char*signt, void*fnsym) {
     /*auto mthcnt = mto->methodCount();
     DBGLOG << mto->className() ;
     DBGLOG << signt;
-    
+
     auto signt2 = QMetaObject::normalizedSignature(signt);
     DBGLOG << signt2;
     for (int i = 0; i < mthcnt; i++) {
         auto mth = mto->method(i);
         DBGLOG << signt << i << mth.methodSignature();
     }
-    
+
     auto sigidx = mto->indexOfSignal(signt);
     DBGLOG << sigidx;
-    
+
     int (QMetaObject::*mthadr)(const char *) const = &QMetaObject::indexOfSignal;
     DBGLOG << mthadr;
 
