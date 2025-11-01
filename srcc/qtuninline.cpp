@@ -65,6 +65,7 @@ void* uninline_qtcore_holder() {
     //QCoreApplication::instance();
 	//QApplication::instance();
 
+	nilcxobj(QWidget)->layout();
 	nilcxobj(QWidget)->palette();
 	nilcxobj(QButton)->autoRepeat();
 	nilcxobj(QMetaObject)->className();
@@ -180,7 +181,12 @@ extern "C" void _ZN7QStringC1EPKc_weakwrap(void*o, const char*p) {
 }
 extern "C"
 void* QStringNew(const char*p) {
+    #if QT_VERSION < 0x040000
+    auto rv = new QString(QString::fromLocal8Bit(p));
+    #else
     auto rv = new QString(p);
+    #endif
+
     return (void*)rv;
 }
 extern "C"
@@ -367,7 +373,7 @@ extern "C"
 void _ZN6QColorC1EPKc_weakwrap(void*o, char*name) {
     new(o) QColor(name);
 }
-#if QT_VERSION > 0x030308
+#if QT_VERSION >= 0x040000
 extern "C"
 void _ZN6QColorC1E11QStringView_weakwrap(void*o, QStringView name) {
     new(o) QColor(name);
