@@ -180,7 +180,12 @@ extern "C" void _ZN7QStringC1EPKc_weakwrap(void*o, const char*p) {
 }
 extern "C"
 void* QStringNew(const char*p) {
+    #if QT_VERSION < 0x040000
+    auto rv = new QString(QString::fromLocal8Bit(p));
+    #else
     auto rv = new QString(p);
+    #endif
+
     return (void*)rv;
 }
 extern "C"
