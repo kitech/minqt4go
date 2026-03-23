@@ -1,13 +1,11 @@
 
-#include "qt3macros.h"
-
 #include <qobject.h>
 #include <QMutex>
 
 #if QT_VERSION >= 0x040000
-
 #include <QHash>
-
+#else
+#include "qt3macros.h"
 #endif
 
 #include "callback_inherit.h"

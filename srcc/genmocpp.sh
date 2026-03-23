@@ -5,7 +5,7 @@
 
 hdrfile=qmitmsloter.h
 
-mocexes="$MOC moc moc-qt3 moc-qt4 moc-qt5 moc-qt6 /usr/lib/qt6/moc"
+mocexes="$MOC moc moc-qt3 moc-qt4 moc-qt5 moc-qt6 /usr/lib/qt6/moc /opt/qt/6.7.3/gcc_64/libexec/moc"
 for mocexe in $mocexes; do
     exepath=$(which $mocexe >/dev/null 2>&1)
     rc=$?

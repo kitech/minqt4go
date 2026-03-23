@@ -31,8 +31,10 @@ qt_standard_project_setup()
 # find_library(theffi libffi ffi REQUIRED)
 # message(${theffi})
 
+set_source_files_properties(qmitmsloter.cpp PROPERTIES SKIP_AUTOMOC ON)
 set(MAINSRC
     # ffi_invoke.cpp 
+    qmitmsloter.cpp
     qdynslotobject.cpp qdynslotobject_moc.cpp
     qdummyobject.cpp
     demangle.cpp

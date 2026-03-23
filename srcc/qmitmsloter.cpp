@@ -35,7 +35,7 @@ void QMitmSloter::metacallir(int _id, QUObject* _a) {
 // _c: direct/queued
 // _id: slot inner id/index
 // _a: arguments with simple packed format
-void QMitmSloter::metacallir(QObject *_o, QMetaObject::Call _c, int _id, void **_a);
+void QMitmSloter::metacallir(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
 	ConnCbdata* d = (ConnCbdata*)this->cbdata;
 	typedef void (*cbfnty)(void*, void*, int, int, void*);
@@ -50,6 +50,8 @@ void QMitmSloter::metacallir(QObject *_o, QMetaObject::Call _c, int _id, void **
 #include "qmitmsloter_moc_v4.8.7.cxx"
 #elif QT_VERSION < 0x060000
 #include "qmitmsloter_moc_v5.15.17.cxx"
+#elif QT_VERSION < 0x061000
+#include "qmitmsloter_moc_v6.7.3.cxx"
 #elif QT_VERSION < 0x070000
 #include "qmitmsloter_moc_v6.10.0.cxx"
 #else

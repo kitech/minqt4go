@@ -5,7 +5,11 @@
 
 // #include "qtuninline.h"
 
+#if QT_VERSION >= 0x040000
+#include <QHash>
+#else
 #include "qt3macros.h"
+#endif
 
 #include <dlfcn.h>
 auto cgoppMallocgcfn = (void* (*)(int))dlsym(RTLD_DEFAULT, "cgoppMallocgc");
@@ -65,9 +69,9 @@ void* uninline_qtcore_holder() {
     //QCoreApplication::instance();
 	//QApplication::instance();
 
-	nilcxobj(QWidget)->layout();
-	nilcxobj(QWidget)->palette();
-	nilcxobj(QButton)->autoRepeat();
+	//nilcxobj(QWidget)->layout();
+	//nilcxobj(QWidget)->palette();
+	//nilcxobj(QButton)->autoRepeat();
 	nilcxobj(QMetaObject)->className();
 
     /////
