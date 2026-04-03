@@ -33,12 +33,12 @@ qt_standard_project_setup()
 
 set_source_files_properties(qmitmsloter.cpp PROPERTIES SKIP_AUTOMOC ON)
 set(MAINSRC
-    # ffi_invoke.cpp 
+    # ffi_invoke.cpp
     qmitmsloter.cpp
     qdynslotobject.cpp qdynslotobject_moc.cpp
     qdummyobject.cpp
     demangle.cpp
-    callback_inherit.cpp       
+    callback_inherit.cpp
     # modelbase.cpp
     qihotfix.cpp
     check_assert.cpp        mainglob.cpp                qtuninline.cpp
@@ -58,3 +58,7 @@ target_link_libraries(QtCoreInline PRIVATE
     # theffi
     # ${GOLIB}
 )
+
+if(ANDROID)
+  include_directories(/opt/android-ndk/sysroot/usr/includedup/aarch64-linux-android/)
+endif(ANDROID)
